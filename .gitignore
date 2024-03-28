@@ -4,6 +4,9 @@
 .AppleDouble
 .LSOverride
 
+# IDE
+.vscode/
+
 # Icon must end with two
 Icon
 
@@ -67,4 +70,4 @@ graph.dot
 Derived/
 
 ### Tuist managed dependencies ###
-Tuist/Dependencies
+Tuist/.build
