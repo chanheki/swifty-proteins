@@ -6,9 +6,9 @@ let targets: [Target] = [
     .feature(
         factory: .init(
             dependencies: [
-                .feature(implements: .Auth),
-                .feature(implements: .Proteins),
-                .domain
+                .domain,
+                .feature(implements: .Authentication),
+                .feature(implements: .Proteins)
             ]
         )
     )
