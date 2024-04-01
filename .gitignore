@@ -4,6 +4,10 @@
 .AppleDouble
 .LSOverride
 
+# key
+*.key
+Signing/
+
 # IDE
 .vscode/
 
