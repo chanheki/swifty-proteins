@@ -33,7 +33,7 @@ public struct TargetFactory {
     var buildRules: [BuildRule]
     var mergedBinaryType: MergedBinaryType
     var mergeable: Bool
-
+    
     public init(
         name: String = "",
         destinations: Destinations = .iOS,
@@ -49,7 +49,18 @@ public struct TargetFactory {
         entitlements: Entitlements? = nil,
         scripts: [TargetScript] = [],
         dependencies: [TargetDependency] = [],
-        settings: Settings? = nil,
+        settings: Settings? = Settings.settings(
+            base: [
+                "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+            ],
+            debug: [
+                "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+            ],
+            release: [
+                "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+            ],
+            defaultSettings: .recommended
+        ),
         coreDataModels: [CoreDataModel] = [],
         environmentVariables: [String: EnvironmentVariable] = [:],
         launchArguments: [LaunchArgument] = [],
@@ -291,6 +302,23 @@ public extension Target {
             newFactory.resources = ["Resources/**"]
             newFactory.product = .staticFramework
         }
+        
+        return make(factory: newFactory)
+    }
+    
+    static func shared(tests module: ModulePath.Shared, factory: TargetFactory) -> Self {
+        var newFactory = factory
+        newFactory.name = ModulePath.Shared.name + module.rawValue + "Tests"
+        newFactory.product = .unitTests
+        newFactory.sources = .tests
+        
+        return make(factory: newFactory)
+    }
+    
+    static func shared(testing module: ModulePath.Shared, factory: TargetFactory) -> Self {
+        var newFactory = factory
+        newFactory.name = ModulePath.Shared.name + module.rawValue + "Testing"
+        newFactory.sources = .testing
         
         return make(factory: newFactory)
     }
