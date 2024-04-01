@@ -25,6 +25,13 @@ re: fclean gen
 test:
 	tuist test
 
+# ---- Code Signing ---- #
+
+signing:
+	swift Scripts/CodeSigning.swift
+
+# ---- Create Module ---- #
+
 module:
 	swift Scripts/GenerateModule.swift
 
