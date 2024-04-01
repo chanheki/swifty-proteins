@@ -6,7 +6,17 @@ public extension Project {
         let organizationName: String? = nil
         let options: Project.Options = .options()
         let packages: [Package] = []
-        let settings: Settings? = nil
+        let settings: Settings? = Settings.settings(
+            base: [
+                "DEVELOPMENT_TEAM": "",
+                "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES"
+            ],
+            configurations: [
+                .debug(name: .debug, settings: [:], xcconfig: nil),
+                .release(name: .release, settings: [:], xcconfig: nil)
+            ],
+            defaultSettings: .recommended
+        )
         let targets: [Target] = targets
         let schemes: [Scheme] = []
         let fileHeaderTemplate: FileHeaderTemplate? = nil
