@@ -20,6 +20,7 @@ let targets: [Target] = [
                             ]
                         ]
                     ],
+                    "NSFaceIDUsageDescription": "Please authenticate to proceed.",
                 ]
                 ),
             dependencies: [

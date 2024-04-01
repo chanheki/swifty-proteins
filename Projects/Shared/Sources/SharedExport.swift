@@ -7,4 +7,6 @@
 
 @_exported import SharedExtensions
 @_exported import SharedExtensionsInterface
+@_exported import SharedModel
+@_exported import SharedModelInterface
 @_exported import SharedDesignSystem
