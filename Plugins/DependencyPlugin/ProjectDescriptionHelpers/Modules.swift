@@ -29,9 +29,8 @@ public extension ModulePath {
 // MARK: FeatureModule
 public extension ModulePath {
     enum Feature: String, CaseIterable {
-        case Biometric
+        case Authentication
         case Proteins
-        case none
 
         public static let name: String = "Feature"
     }
@@ -43,7 +42,6 @@ public extension ModulePath {
     enum Domain: String, CaseIterable {
         case Biometric
         case Proteins
-        case none
 
         public static let name: String = "Domain"
     }
@@ -53,8 +51,8 @@ public extension ModulePath {
 
 public extension ModulePath {
     enum Core: String, CaseIterable {
+        case Authentication
         case Network
-        case none
 
         public static let name: String = "Core"
     }
@@ -67,7 +65,6 @@ public extension ModulePath {
         case Model
         case Extensions
         case DesignSystem
-        case none
 
         public static let name: String = "Shared"
     }
