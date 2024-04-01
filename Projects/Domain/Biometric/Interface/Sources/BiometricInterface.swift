@@ -1,5 +1,3 @@
-// This is for Tuist
-
-public protocol BiometricInterface {
-
+public protocol BiometricAuthenticationServiceProtocol {
+    func authenticate(completion: @escaping (Bool, Error?) -> Void)
 }

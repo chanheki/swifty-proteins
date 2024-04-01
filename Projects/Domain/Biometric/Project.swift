@@ -7,7 +7,11 @@ let project = Project.makeModule(
     targets: [    
         .domain(
             interface: .Biometric,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .core
+                ]
+            )
         ),
         .domain(
             implements: .Biometric,
