@@ -7,5 +7,5 @@
 
 @_exported import FeatureProteins
 @_exported import FeatureProteinsInterface
-@_exported import FeatureBiometric
-@_exported import FeatureBiometricInterface
+@_exported import FeatureAuthentication
+@_exported import FeatureAuthenticationInterface

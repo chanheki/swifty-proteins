@@ -1,5 +1,3 @@
 // This is for Tuist
 
-public protocol ExtensionsInterface {
-
-}
+public protocol Then {}

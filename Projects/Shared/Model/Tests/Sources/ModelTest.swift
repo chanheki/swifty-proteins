@@ -1,6 +1,6 @@
 import XCTest
 
-final class BiometricTests: XCTestCase {
+final class ModelTests: XCTestCase {
     override func setUpWithError() throws {}
 
     override func tearDownWithError() throws {}

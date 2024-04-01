@@ -3,43 +3,47 @@ import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project = Project.makeModule(
-    name: ModulePath.Feature.name+ModulePath.Feature.Biometric.rawValue,
+    name: ModulePath.Feature.name+ModulePath.Feature.Authentication.rawValue,
     targets: [    
         .feature(
-            interface: .Biometric,
-            factory: .init()
-        ),
-        .feature(
-            implements: .Biometric,
+            interface: .Authentication,
             factory: .init(
                 dependencies: [
-                    .feature(interface: .Biometric)
+                    .domain
+                ]
+            )
+        ),
+        .feature(
+            implements: .Authentication,
+            factory: .init(
+                dependencies: [
+                    .feature(interface: .Authentication)
                 ]
             )
         ),
     
         .feature(
-            testing: .Biometric,
+            testing: .Authentication,
             factory: .init(
                 dependencies: [
-                    .feature(interface: .Biometric)
+                    .feature(interface: .Authentication)
                 ]
             )
         ),
         .feature(
-            tests: .Biometric,
+            tests: .Authentication,
             factory: .init(
                 dependencies: [
-                    .feature(testing: .Biometric)
+                    .feature(testing: .Authentication)
                 ]
             )
         ),
     
         .feature(
-            example: .Biometric,
+            example: .Authentication,
             factory: .init(
                 dependencies: [
-                    .feature(interface: .Biometric)
+                    .feature(interface: .Authentication)
                 ]
             )
         )
