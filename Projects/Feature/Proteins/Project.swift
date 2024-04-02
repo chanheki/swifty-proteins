@@ -7,13 +7,17 @@ let project = Project.makeModule(
     targets: [    
         .feature(
             interface: .Proteins,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .domain
+                ]
+            )
         ),
         .feature(
             implements: .Proteins,
             factory: .init(
                 dependencies: [
-                    .feature(interface: .Proteins)
+                    .feature(interface: .Proteins),
                 ]
             )
         ),
