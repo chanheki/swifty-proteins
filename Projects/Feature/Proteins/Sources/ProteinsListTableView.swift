@@ -1,26 +1,91 @@
-
+//
+//  ProteinsListTableView.swift
+//  FeatureProteins
+//
+//  Created by Chan on 4/3/24.
+//
 
 import UIKit
 
-class ProteinsListTableView: UITableView {
-    // 커스텀 초기화 메서드
-    override init(frame: CGRect, style: UITableView.Style) {
+import Domain
+import Shared
+
+public class ProteinsListTableView: UITableView {
+    
+    var viewModel: LigandsViewModel
+    
+    init(frame: CGRect, style: UITableView.Style, viewModel: LigandsViewModel) {
+        self.viewModel = viewModel
         super.init(frame: frame, style: style)
         commonInit()
+        dataDelegateInit()
     }
     
     required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required init?(coder: NSCoder, viewModel: LigandsViewModel) {
+        self.viewModel = viewModel
         super.init(coder: coder)
         commonInit()
+        dataDelegateInit()
     }
     
     private func commonInit() {
-        // 여기에 테이블 뷰를 설정하는 코드 추가
-        self.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        self.tableFooterView = UIView() // 빈 셀 하단의 구분선을 숨김
-        
-        // 기타 커스텀 설정...
-        self.backgroundColor = .white
-        self.separatorStyle = .singleLine
+        register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        sectionHeaderTopPadding = 0
+        backgroundColor = .white
+        separatorStyle = .singleLine
+        tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: CGFloat.leastNonzeroMagnitude))
     }
+    
+    private func dataDelegateInit() {
+        dataSource = self
+        delegate = self
+    }
+}
+
+// UITableViewDataSource 구현
+extension ProteinsListTableView: UITableViewDataSource {
+    
+//    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+//        UIView()
+//    }
+//
+//    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+//        .leastNormalMagnitude
+//    }
+    
+    public func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.sectionTitles.count
+    }
+    
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let sectionKey = viewModel.sectionTitles[section]
+        return viewModel.ligandsBySection[sectionKey]?.count ?? 0
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let sectionKey = viewModel.sectionTitles[indexPath.section]
+        if let ligand = viewModel.ligandsBySection[sectionKey]?[indexPath.row] {
+            cell.textLabel?.text = ligand.identifier
+        }
+        return cell
+    }
+    
+    public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        return viewModel.sectionTitles
+    }
+    
+    public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+        return viewModel.sectionTitles.firstIndex(of: title) ?? 0
+    }
+}
+
+// UITableViewDelegate 구현
+extension ProteinsListTableView: UITableViewDelegate {
+    // UITableViewDelegate 메서드 구현 (옵션)
+    // 예: public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
 }
