@@ -9,4 +9,6 @@
 @_exported import SharedExtensionsInterface
 @_exported import SharedModel
 @_exported import SharedModelInterface
+@_exported import SharedCommonUI
+@_exported import SharedCommonUIInterface
 @_exported import SharedDesignSystem
