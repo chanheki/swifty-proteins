@@ -7,52 +7,27 @@
 
 import UIKit
 
-import Domain
 import Shared
 
-public class ProteinsListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    var proteinsTableView: ProteinsListTableView!
-    var viewModel: LigandsViewModel!
-    
+public class ProteinsListViewController: BaseViewController<ProteinsListView>, UISearchResultsUpdating {
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        setupTableView()
-    }
-
-    private func setupTableView() {
-        proteinsTableView = ProteinsListTableView(frame: self.view.bounds, style: .plain)
-        self.view.addSubview(proteinsTableView)
-
-        viewModel = LigandsViewModel()
-
-        proteinsTableView.dataSource = self
-        proteinsTableView.delegate = self
         
-        proteinsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "LigandCell")
+        setNavigationBarBackgroundColor(.proteins)
+        navigationBar.configureSearchController(delegate: self, navigationItem: navigationItem)
+        definesPresentationContext = true
+    }
+
+}
+
+// UISearchResultsUpdating 프로토콜을 확장하여 검색 결과 업데이트 로직을 구현합니다.
+extension ProteinsListViewController {
+    public func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text, !searchText.isEmpty else {
+            // 검색 텍스트가 없는 경우의 처리 로직 (예: 모든 데이터를 다시 표시)
+            return
+        }
         
-        // 레이아웃 조정이 필요한 경우 여기에 추가
-        proteinsTableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            proteinsTableView.topAnchor.constraint(equalTo: view.topAnchor),
-            proteinsTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            proteinsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            proteinsTableView.rightAnchor.constraint(equalTo: view.rightAnchor)
-        ])
     }
-
-    
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.ligands.count
-    }
-
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "LigandCell", for: indexPath)
-        let ligand = viewModel.ligands[indexPath.row]
-        cell.textLabel?.text = ligand.identifier
-        return cell
-    }
-
-
-    // UITableViewDelegate 메서드 구현 (선택적)
-    // 여기에 셀 선택 처리 등을 추가할 수 있음
 }
