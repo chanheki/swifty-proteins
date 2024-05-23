@@ -5,6 +5,7 @@
 //
 
 import UIKit
+
 import SharedExtensions
 import SharedDesignSystem
 
@@ -95,10 +96,6 @@ open class BaseViewController<View: UIView>: UIViewController {
         navigationBar.moreButton.tintColor = color
     }
     
-    public func setNavigationBarSearchControllerHidden(_ hidden: Bool) {
-        navigationBar.searchController?.searchBar.isHidden = hidden
-    }
-    
     public func setNavigationBarHidden(_ hidden: Bool) {
         navigationBar.isHidden = hidden
         
@@ -161,10 +158,6 @@ open class BaseViewController<View: UIView>: UIViewController {
     
     func setNavigationBarDoneButtonHidden(_ hidden: Bool) {
         navigationBar.doneButton.isHidden = hidden
-    }
-    
-    func setSearchControllerHidden(_ hidden: Bool) {
-        navigationBar.searchController?.searchBar.isHidden = hidden
     }
     
     func setNavigationBarAddButtonAction(_ selector: Selector) {

@@ -14,7 +14,6 @@ public final class NavigationBar: UIView {
     public var addButton = UIButton()
     public var moreButton = UIButton()
     public var doneButton = UIButton()
-    public var searchController: UISearchController?
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -86,17 +85,5 @@ public final class NavigationBar: UIView {
             doneButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             doneButton.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
-    }
-    
-    public func configureSearchController(delegate: UISearchResultsUpdating, navigationItem: UINavigationItem) {
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchResultsUpdater = delegate
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Ligands"
-        
-        self.searchController = searchController
-        
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
     }
 }
