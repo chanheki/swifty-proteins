@@ -10,15 +10,15 @@ import UIKit
 import Domain
 import Shared
 
-public class ProteinsListTableView: UITableView {
+// ProteinsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
+public final class ProteinsListTableView: UITableView {
     
-    var viewModel: LigandsViewModel
+    private var viewModel: LigandsViewModel
     
     init(frame: CGRect, style: UITableView.Style, viewModel: LigandsViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame, style: style)
         commonInit()
-        dataDelegateInit()
     }
     
     required init?(coder: NSCoder) {
@@ -29,7 +29,14 @@ public class ProteinsListTableView: UITableView {
         self.viewModel = viewModel
         super.init(coder: coder)
         commonInit()
-        dataDelegateInit()
+    }
+    
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        
+        if window != nil {
+            dataDelegateInit()
+        }
     }
     
     private func commonInit() {
@@ -44,18 +51,11 @@ public class ProteinsListTableView: UITableView {
         dataSource = self
         delegate = self
     }
+    
 }
 
 // UITableViewDataSource 구현
 extension ProteinsListTableView: UITableViewDataSource {
-    
-//    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-//        UIView()
-//    }
-//
-//    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-//        .leastNormalMagnitude
-//    }
     
     public func numberOfSections(in tableView: UITableView) -> Int {
         return viewModel.sectionTitles.count
@@ -86,6 +86,11 @@ extension ProteinsListTableView: UITableViewDataSource {
 
 // UITableViewDelegate 구현
 extension ProteinsListTableView: UITableViewDelegate {
+    
+    public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return viewModel.sectionTitles[section]
+    }
+
     // UITableViewDelegate 메서드 구현 (옵션)
     // 예: public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
 }
