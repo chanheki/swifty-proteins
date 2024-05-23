@@ -8,31 +8,39 @@
 import UIKit
 
 import Domain
-import Shared
 
-public class ProteinsListView: UIView {
+public final class ProteinsListView: UIView {
     
-    var proteinsTableView: ProteinsListTableView
+    var proteinsTableView: ProteinsListTableView!
     var viewModel: LigandsViewModel
     
     override init(frame: CGRect) {
         viewModel = LigandsViewModel()
-        proteinsTableView = ProteinsListTableView(frame: .zero, style: .grouped, viewModel: viewModel)
-        
         super.init(frame: frame)
         commonInit()
     }
     
     required init?(coder: NSCoder) {
         viewModel = LigandsViewModel()
-        proteinsTableView = ProteinsListTableView(frame: .zero, style: .grouped, viewModel: viewModel)
-        
         super.init(coder: coder)
         commonInit()
     }
     
+    override public func didMoveToWindow() {
+        super.didMoveToWindow()
+        
+        if window != nil {
+            setupView()
+        }
+    }
+    
     private func commonInit() {
+        proteinsTableView = ProteinsListTableView(frame: .zero, style: .grouped, viewModel: viewModel)
+    }
+    
+    private func setupView() {
         addSubview(proteinsTableView)
+        
         proteinsTableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             proteinsTableView.topAnchor.constraint(equalTo: self.topAnchor),
