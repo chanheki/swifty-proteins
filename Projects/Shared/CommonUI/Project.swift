@@ -1,5 +1,5 @@
-import ProjectDescriptionHelpers
 import ProjectDescription
+import ProjectDescriptionHelpers
 import DependencyPlugin
 
 let project = Project.makeModule(
@@ -7,7 +7,13 @@ let project = Project.makeModule(
     targets: [    
         .shared(
             interface: .CommonUI,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .shared(interface: .Model),
+                    .shared(interface: .Extensions),
+                    .shared(implements: .DesignSystem),
+                ]
+            )
         ),
         .shared(
             implements: .CommonUI,
@@ -17,6 +23,7 @@ let project = Project.makeModule(
                 ]
             )
         ),
+    
         .shared(
             testing: .CommonUI,
             factory: .init(
