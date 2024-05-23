@@ -7,9 +7,10 @@
 
 import UIKit
 
-import Domain
+import DomainBiometric
+import CoreAuthentication
 
-public class BiometricAuthenticationFlow {
+public final class BiometricAuthenticationFlow {
     private var window: UIWindow?
     
     public init(window: UIWindow?) {
@@ -17,9 +18,12 @@ public class BiometricAuthenticationFlow {
     }
     
     public func start(completion: @escaping (Bool, Error?) -> Void) {
-        let authService = AuthenticationService()
+        let authenticator = BiometricAuthenticator()
+        let authService = AuthenticationService(authenticator: authenticator)
         authService.authenticate { success, error in
-            completion(success, error)
+            DispatchQueue.main.async {
+                completion(success, error)
+            }
         }
     }
     
