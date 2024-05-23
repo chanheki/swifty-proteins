@@ -1,18 +1,33 @@
+//
+//  LigandsViewModel.swift
+//  DomainProteins
+//
+//  Created by Chan on 4/2/24.
+//
+
+import Combine
+
 import Shared
 
 public class LigandsViewModel {
     
+    @Published public var ligandsBySection: [String: [Ligand]] = [:]
     // Full ligands
     public var ligands: [Ligand] = []
     // 섹션별로 정렬된 Ligands
-    public var ligandsBySection: [String: [Ligand]] = [:]
     // 섹션 타이틀 배열
     public var sectionTitles: [String] = []
-    
+    // 검색된 Ligands
+    public var filteredLigands: [Ligand] = [] {
+        didSet {
+            self.organizeLigandsIntoSections()
+        }
+    }
     
     public init() {
         self.ligands = loadLigands()
-        organizeLigandsIntoSections()
+        self.filteredLigands = ligands
+        self.organizeLigandsIntoSections()
     }
     
     private func loadLigands() -> [Ligand] {
@@ -24,7 +39,7 @@ public class LigandsViewModel {
     private func organizeLigandsIntoSections() {
         var sections: [String: [Ligand]] = [:]
         
-        for ligand in ligands {
+        for ligand in filteredLigands {
             // Ligand 식별자의 첫 글자를 섹션 키로 사용
             let sectionKey = String(ligand.identifier.prefix(1))
             if sections[sectionKey] == nil {
@@ -37,6 +52,14 @@ public class LigandsViewModel {
         // 섹션 타이틀을 알파벳 순으로 정렬
         sectionTitles = sections.keys.sorted()
         ligandsBySection = sections
+    }
+    
+    public func searchLigands(with query: String) {
+        if query.isEmpty {
+            filteredLigands = ligands
+        } else {
+            filteredLigands = ligands.filter { $0.identifier.lowercased().contains(query.lowercased()) }
+        }
     }
 }
 
