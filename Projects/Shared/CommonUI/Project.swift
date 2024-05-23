@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-import ProjectDescription
-import ProjectDescriptionHelpers
-=======
 import ProjectDescriptionHelpers
 import ProjectDescription
->>>>>>> Stashed changes
 import DependencyPlugin
 
 let project = Project.makeModule(
@@ -12,17 +7,7 @@ let project = Project.makeModule(
     targets: [    
         .shared(
             interface: .CommonUI,
-<<<<<<< Updated upstream
-            factory: .init(
-                dependencies: [
-                    .shared(interface: .Model),
-                    .shared(interface: .Extensions),
-                    .shared(implements: .DesignSystem),
-                ]
-            )
-=======
             factory: .init()
->>>>>>> Stashed changes
         ),
         .shared(
             implements: .CommonUI,
@@ -32,7 +17,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-    
         .shared(
             testing: .CommonUI,
             factory: .init(
