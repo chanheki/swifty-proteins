@@ -17,7 +17,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-    
         .core(
             testing: .Authentication,
             factory: .init(
