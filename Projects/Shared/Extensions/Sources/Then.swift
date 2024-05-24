@@ -9,7 +9,7 @@ import UIKit
 
 import SharedExtensionsInterface
 
-extension Then where Self: AnyObject {
+public extension Then where Self: AnyObject {
     
     func then(block: (Self) -> Void) -> Self {
         block(self)
