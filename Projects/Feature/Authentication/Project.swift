@@ -37,16 +37,6 @@ let project = Project.makeModule(
                     .feature(testing: .Authentication)
                 ]
             )
-        ),
-    
-        .feature(
-            example: .Authentication,
-            factory: .init(
-                dependencies: [
-                    .feature(interface: .Authentication)
-                ]
-            )
         )
-
     ]
 )

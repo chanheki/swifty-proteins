@@ -6,9 +6,12 @@
 //
 
 import LocalAuthentication
+import CoreAuthenticationInterface
 
-public final class BiometricAuthenticator {
-    public static func authenticate(completion: @escaping (Bool, Error?) -> Void) {
+public final class BiometricAuthenticator: AuthenticationInterface {
+    public init() {}
+    
+    public func authenticate(completion: @escaping (Bool, Error?) -> Void) {
         let context = LAContext()
         var error: NSError?
         
