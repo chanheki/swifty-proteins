@@ -172,7 +172,7 @@ open class BaseViewController<View: UIView>: UIViewController {
         navigationBar.doneButton.addTarget(self, action: selector, for: .touchUpInside)
     }
     
-    func setNavigationBarTitleLabelText(_ text: String?) {
+    public func setNavigationBarTitleLabelText(_ text: String?) {
         navigationBar.titleLabel.text = text
     }
     
