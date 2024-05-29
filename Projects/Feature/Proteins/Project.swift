@@ -18,6 +18,7 @@ let project = Project.makeModule(
             factory: .init(
                 dependencies: [
                     .feature(interface: .Proteins),
+                    .feature(testing: .Proteins)
                 ]
             )
         ),
@@ -33,7 +34,7 @@ let project = Project.makeModule(
             tests: .Proteins,
             factory: .init(
                 dependencies: [
-                    .feature(testing: .Proteins)
+                    .feature(implements: .Proteins)
                 ]
             )
         )

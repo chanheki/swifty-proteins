@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 
+import FeatureProteinsTesting
 import DomainProteins
 import Shared
 
@@ -101,6 +102,10 @@ extension ProteinsListViewController: ProteinsListTableViewDelegate {
         
         if let ligand = viewModel?.ligandsBySection[sectionKey]?[indexPath.row] {
             let proteinsViewController = ProteinsViewController()
+            
+            // Mock Test
+            proteinsViewController.pdbDataProvider = MockPDBDataProvider()
+            
             proteinsViewController.ligand = ligand
             proteinsViewController.title = ligand.identifier
             proteinsViewController.setNavigationBarTitleLabelText(ligand.identifier)
