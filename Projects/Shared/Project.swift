@@ -6,6 +6,7 @@ let targets: [Target] = [
     .shared(
         factory: .init(
             dependencies: [
+                .shared(implements: .CommonUI),
                 .shared(implements: .DesignSystem),
                 .shared(implements: .Extensions),
                 .shared(implements: .Model),
