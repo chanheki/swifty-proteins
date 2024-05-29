@@ -9,7 +9,8 @@ import UIKit
 import Combine
 
 import DomainProteins
-import Shared
+import SharedCommonUI
+import SharedExtensions
 
 public final class ProteinsListViewController: BaseViewController<ProteinsListView>, UISearchResultsUpdating {
     
@@ -20,7 +21,7 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
         super.viewDidLoad()
         bindViewModel()
     }
-
+    
     private func bindViewModel() {
         guard let proteinsView = self.contentView as? ProteinsListView else {
             return
@@ -59,8 +60,9 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
         // 네비게이션 바 설정
         searchBarController.navigationBar.prefersLargeTitles = true
         searchBarController.navigationBar.isTranslucent = true
-        searchBarController.navigationBar.barTintColor = .blue
-        searchBarController.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        searchBarController.navigationBar.tintColor = .foregroundColor
+        searchBarController.navigationBar.barTintColor = .foregroundColor
+        searchBarController.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.foregroundColor]
         searchBarController.navigationBar.backgroundColor = .backgroundColor
         return searchBarController
     }
