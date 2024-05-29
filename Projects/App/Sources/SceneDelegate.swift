@@ -8,9 +8,12 @@
 import UIKit
 
 import Feature
+import SharedCommonUI
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
+    var coverViewManager: CoverViewManager?
+    var biometricFlow: BiometricAuthenticationFlow?
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -22,28 +25,30 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = initialViewController.initialView()
         window?.makeKeyAndVisible()
         
-        authenticateUser()
+        self.authenticateUser()
     }
     
-    private func authenticateUser() {
-        // 바이오메트릭 인증 로직
-        let biometricFlow = BiometricAuthenticationFlow(window: window)
-        
-        biometricFlow.start { [weak self] success, error in
-            DispatchQueue.main.async {
-                if success {
-                    // 앱 정상 실행 Flow Feature
-                    self?.showMainViewController()
-                } else {
-                    // 앱 꺼짐 혹은 재시도 Flow Feature
-                    biometricFlow.showFailureViewController(error: error)
-                }
-            }
+    func sceneWillResignActive(_ scene: UIScene) {
+        // 홈 버튼 두 번 눌러 앱이 비활성화될 때 커버 뷰 추가
+        coverViewManager?.addCoverView()
+    }
+    
+    func sceneDidEnterBackground(_ scene: UIScene) {
+        // 대기 모드 진입 시 커버 뷰 추가
+        coverViewManager?.addCoverView()
+    }
+    
+    func sceneWillEnterForeground(_ scene: UIScene) {
+        // 다시 활성화될 때 인증 로직 호출
+        if coverViewManager?.hasCoverView() == true {
+            authenticateUser()
         }
     }
     
-    private func showMainViewController() {
-        // 메인 뷰 컨트롤러를 표시하는 로직이 필요한 경우 여기에 추가
-        // 현재 예시에서는 초기 설정 시 이미 메인 뷰 컨트롤러를 설정했기 때문에 별도의 로직이 필요 없습니다.
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        // 다시 활성화될 때 인증 로직 호출
+        if coverViewManager?.hasCoverView() == true {
+            authenticateUser()
+        }
     }
 }

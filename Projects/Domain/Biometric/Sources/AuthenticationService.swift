@@ -9,10 +9,14 @@ import Foundation
 import Core
 
 public final class AuthenticationService {
-    public init() {}
+    private let authenticator: AuthenticationInterface
+    
+    public init(authenticator: AuthenticationInterface) {
+        self.authenticator = authenticator
+    }
 
     public func authenticate(completion: @escaping (Bool, Error?) -> Void) {
-        BiometricAuthenticator.authenticate { success, error in
+        authenticator.authenticate { success, error in
             completion(success, error)
         }
     }
