@@ -8,7 +8,7 @@
 import UIKit
 
 import Domain
-import Shared
+import SharedExtensions
 
 // ProteinsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
 public final class ProteinsListTableView: UITableView {
@@ -41,10 +41,16 @@ public final class ProteinsListTableView: UITableView {
     
     private func commonInit() {
         register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        sectionHeaderTopPadding = 0
-        backgroundColor = .white
         separatorStyle = .singleLine
-        tableHeaderView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 0.0, height: CGFloat.leastNonzeroMagnitude))
+        backgroundColor = .backgroundColor
+
+        // 섹션 헤더
+        sectionHeaderTopPadding = 0
+        
+        // 섹션 인덱스 스타일 설정
+        sectionIndexColor = .foregroundColor
+        sectionIndexBackgroundColor = .clear
+        sectionIndexTrackingBackgroundColor = .lightGray.withAlphaComponent(0.6)
     }
     
     private func dataDelegateInit() {
