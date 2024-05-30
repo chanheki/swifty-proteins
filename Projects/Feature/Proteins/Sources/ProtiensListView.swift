@@ -35,7 +35,7 @@ public final class ProteinsListView: UIView {
     }
     
     private func commonInit() {
-        proteinsTableView = ProteinsListTableView(frame: .zero, style: .grouped, viewModel: viewModel)
+        proteinsTableView = ProteinsListTableView(frame: .zero, style: .plain, viewModel: viewModel)
     }
     
     private func setupView() {

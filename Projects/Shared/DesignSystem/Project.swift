@@ -5,7 +5,11 @@ import DependencyPlugin
 let targets: [Target] = [
     .shared(
         implements: .DesignSystem,
-        factory: .init()
+        factory: .init(
+                dependencies: [
+                    .external(name: "Lottie")
+                ]
+            )
     )
 ]
 

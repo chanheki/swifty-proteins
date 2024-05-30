@@ -46,11 +46,9 @@ public final class ProteinsListTableView: UITableView {
     
     private func commonInit() {
         register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        sectionHeaderTopPadding = 0
-        backgroundColor = .white
         separatorStyle = .singleLine
         backgroundColor = .backgroundColor
-        
+      
         // 섹션 헤더
         sectionHeaderTopPadding = 0
         
