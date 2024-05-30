@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 
+import FeatureProteinsTesting
 import DomainProteins
 import SharedCommonUI
 import SharedExtensions
@@ -40,6 +41,7 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
     public override func setupProperty() {
         if let proteinListView = self.contentView as? ProteinsListView {
             viewModel = proteinListView.viewModel
+            proteinListView.proteinsTableView.selectionDelegate = self
         }
         
         self.view.backgroundColor = .backgroundColor
@@ -89,4 +91,28 @@ extension ProteinsListViewController {
     public func updateSearchResults(for searchController: UISearchController) {
         viewModel?.searchLigands(with: searchController.searchBar.text ?? "")
     }
+}
+
+extension ProteinsListViewController: ProteinsListTableViewDelegate {
+    // ProteinsListTableViewDelegate 구현
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let sectionKey = viewModel?.sectionTitles[indexPath.section] else {
+            // 에러처리뷰 만들어서 넣을 것
+            navigationController?.pushViewController(UIViewController(), animated: true)
+            return
+        }
+        
+        if let ligand = viewModel?.ligandsBySection[sectionKey]?[indexPath.row] {
+            let proteinsViewController = ProteinsViewController()
+            
+            // Mock Test
+            proteinsViewController.pdbDataProvider = MockPDBDataProvider()
+            
+            proteinsViewController.ligand = ligand
+            proteinsViewController.title = ligand.identifier
+            proteinsViewController.setNavigationBarTitleLabelText(ligand.identifier)
+            navigationController?.pushViewController(proteinsViewController, animated: true)
+        }
+    }
+
 }

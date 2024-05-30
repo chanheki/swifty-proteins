@@ -10,11 +10,16 @@ import UIKit
 import Domain
 import SharedExtensions
 
+protocol ProteinsListTableViewDelegate: AnyObject {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
+}
+
 // ProteinsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
 public final class ProteinsListTableView: UITableView {
     
     private var viewModel: LigandsViewModel
-    
+    weak var selectionDelegate: ProteinsListTableViewDelegate?
+
     init(frame: CGRect, style: UITableView.Style, viewModel: LigandsViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame, style: style)
@@ -43,7 +48,7 @@ public final class ProteinsListTableView: UITableView {
         register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         separatorStyle = .singleLine
         backgroundColor = .backgroundColor
-
+      
         // 섹션 헤더
         sectionHeaderTopPadding = 0
         
@@ -96,7 +101,9 @@ extension ProteinsListTableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return viewModel.sectionTitles[section]
     }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectionDelegate?.tableView(tableView, didSelectRowAt: indexPath)
+    }
 
-    // UITableViewDelegate 메서드 구현 (옵션)
-    // 예: public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
 }
