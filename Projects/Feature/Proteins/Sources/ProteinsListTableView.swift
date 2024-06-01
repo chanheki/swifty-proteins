@@ -17,10 +17,10 @@ protocol ProteinsListTableViewDelegate: AnyObject {
 // ProteinsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
 public final class ProteinsListTableView: UITableView {
     
-    private var viewModel: LigandsViewModel
+    private var viewModel: LigandsListViewModel
     weak var selectionDelegate: ProteinsListTableViewDelegate?
 
-    init(frame: CGRect, style: UITableView.Style, viewModel: LigandsViewModel) {
+    init(frame: CGRect, style: UITableView.Style, viewModel: LigandsListViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame, style: style)
         commonInit()
@@ -30,7 +30,7 @@ public final class ProteinsListTableView: UITableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    required init?(coder: NSCoder, viewModel: LigandsViewModel) {
+    required init?(coder: NSCoder, viewModel: LigandsListViewModel) {
         self.viewModel = viewModel
         super.init(coder: coder)
         commonInit()

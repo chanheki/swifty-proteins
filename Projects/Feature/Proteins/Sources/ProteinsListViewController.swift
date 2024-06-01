@@ -8,14 +8,13 @@
 import UIKit
 import Combine
 
-import FeatureProteinsTesting
 import DomainProteins
 import SharedCommonUI
 import SharedExtensions
 
 public final class ProteinsListViewController: BaseViewController<ProteinsListView>, UISearchResultsUpdating {
     
-    private var viewModel: LigandsViewModel?
+    private var viewModel: LigandsListViewModel?
     private var cancellables: Set<AnyCancellable> = []
     
     public override func viewDidLoad() {
@@ -104,9 +103,6 @@ extension ProteinsListViewController: ProteinsListTableViewDelegate {
         
         if let ligand = viewModel?.ligandsBySection[sectionKey]?[indexPath.row] {
             let proteinsViewController = ProteinsViewController()
-            
-            // Mock Test
-            proteinsViewController.pdbDataProvider = MockPDBDataProvider()
             
             proteinsViewController.ligand = ligand
             proteinsViewController.title = ligand.identifier
