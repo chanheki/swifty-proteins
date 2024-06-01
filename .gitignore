@@ -7,6 +7,7 @@
 # key
 *.key
 Signing/
+*.plist
 
 # IDE
 .vscode/
