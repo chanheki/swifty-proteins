@@ -21,7 +21,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-    
         .domain(
             testing: .Proteins,
             factory: .init(
@@ -34,6 +33,7 @@ let project = Project.makeModule(
             tests: .Proteins,
             factory: .init(
                 dependencies: [
+                    .domain(implements: .Proteins),
                     .domain(testing: .Proteins)
                 ]
             )
