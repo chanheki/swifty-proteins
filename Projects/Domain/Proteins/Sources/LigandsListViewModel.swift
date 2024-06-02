@@ -1,5 +1,5 @@
 //
-//  LigandsViewModel.swift
+//  LigandsListViewModel.swift
 //  DomainProteins
 //
 //  Created by Chan on 4/2/24.
@@ -9,7 +9,7 @@ import Combine
 
 import Shared
 
-public class LigandsViewModel {
+public class LigandsListViewModel {
     
     @Published public var ligandsBySection: [String: [Ligand]] = [:]
     // Full ligands
