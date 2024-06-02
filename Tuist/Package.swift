@@ -7,7 +7,11 @@ import ProjectDescription
 let packageSettings = PackageSettings(
     productTypes: [
         "Lottie": .framework,
-        "AlamofireDynamic": .framework
+        "AlamofireDynamic": .framework,
+        "Alamofire": .framework,
+        "Firebase" : .framework,
+        "GoogleSignIn" : .framework,
+        "GoogleUtilities" : .framework,
     ]
 )
 #endif
@@ -16,6 +20,9 @@ let package = Package(
     name: "SwiftyProteins",
     dependencies: [
         .package(url: "https://github.com/airbnb/lottie-ios.git", from: "4.4.3"),
-        .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.0")
+        .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "10.27.0"),
+        .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "6.0.0"),
+        .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.0")
     ]
 )
