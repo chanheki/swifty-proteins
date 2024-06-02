@@ -12,16 +12,16 @@ import Domain
 public final class ProteinsListView: UIView {
     
     var proteinsTableView: ProteinsListTableView!
-    var viewModel: LigandsViewModel
+    var viewModel: LigandsListViewModel
     
     override init(frame: CGRect) {
-        viewModel = LigandsViewModel()
+        viewModel = LigandsListViewModel()
         super.init(frame: frame)
         commonInit()
     }
     
     required init?(coder: NSCoder) {
-        viewModel = LigandsViewModel()
+        viewModel = LigandsListViewModel()
         super.init(coder: coder)
         commonInit()
     }

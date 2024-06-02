@@ -7,7 +7,7 @@ import ProjectDescription
 let packageSettings = PackageSettings(
     productTypes: [
         "Lottie": .framework,
-        "Alamofire": .framework
+        "AlamofireDynamic": .framework
     ]
 )
 #endif

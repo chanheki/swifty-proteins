@@ -6,5 +6,5 @@
 //
 
 public protocol ProteinsPDBDataProvider {
-    func getPDBData() -> String
+    func getPDBData(name: TestingNameEnum) -> String
 }
