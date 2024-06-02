@@ -7,6 +7,11 @@
 
 import LocalAuthentication
 import CoreAuthenticationInterface
+import FirebaseCoreInternal
+import UIKit
+import Alamofire
+//import SwiftyJSON
+//import SVProgressHUD
 
 public final class BiometricAuthenticator: AuthenticationInterface {
     public init() {}
