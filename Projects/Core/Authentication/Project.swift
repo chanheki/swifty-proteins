@@ -29,6 +29,7 @@ let project = Project.makeModule(
                     .external(name: "FirebaseStorage"),
                     .external(name: "Alamofire"),
                     .external(name: "GoogleSignIn"),
+                    .external(name: "GoogleSignInSwift"),
                 ]
             )
         ),
