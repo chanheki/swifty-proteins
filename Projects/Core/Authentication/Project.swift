@@ -15,6 +15,7 @@ let project = Project.makeModule(
                 resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .Authentication),
+                    .core(interface: .CoreDataProvider),
                     .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAppCheck"),
                     .external(name: "FirebaseAnalyticsOnDeviceConversion"),
@@ -34,7 +35,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-
         .core(
             testing: .Authentication,
             factory: .init(
@@ -46,14 +46,6 @@ let project = Project.makeModule(
         .core(
             tests: .Authentication,
             factory: .init(
-                infoPlist: .extendingDefault(with: [
-                    "CFBundleURLTypes": [
-                        [
-                            "CFBundleTypeRole": "Editor",
-                            "CFBundleURLSchemes": ["com.googleusercontent.apps.711006035349-eec6sk24kp81hr622roopaccnakqh6s6"]
-                        ]
-                    ]
-                ]),
                 dependencies: [
                     .core(testing: .Authentication)
                 ]
