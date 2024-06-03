@@ -8,6 +8,9 @@ gen:
 	tuist generate
 
 clean:
+	rm -rf Tuist/Package.resolved
+	rm -rf ~/.tuist/Cache
+	rm -rf ~/Library/Caches/tuist
 	tuist clean
 
 fclean: clean
