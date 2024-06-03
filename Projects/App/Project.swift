@@ -20,7 +20,13 @@ let targets: [Target] = [
                             ]
                         ]
                     ],
-                    "NSFaceIDUsageDescription": "Please authenticate to proceed."
+                    "NSFaceIDUsageDescription": "Please authenticate to proceed.",
+                    "CFBundleURLTypes": [
+                        [
+                            "CFBundleTypeRole": "Editor",
+                            "CFBundleURLSchemes": ["com.googleusercontent.apps.711006035349-eec6sk24kp81hr622roopaccnakqh6s6"]
+                        ]
+                    ]
                 ]
             ),
             dependencies: [
