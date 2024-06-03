@@ -4,7 +4,7 @@ import DependencyPlugin
 
 let project = Project.makeModule(
     name: ModulePath.Core.name+ModulePath.Core.Authentication.rawValue,
-    targets: [    
+    targets: [
         .core(
             interface: .Authentication,
             factory: .init()
@@ -44,11 +44,20 @@ let project = Project.makeModule(
         .core(
             tests: .Authentication,
             factory: .init(
+                infoPlist: .extendingDefault(with: [
+                    "CFBundleURLTypes": [
+                        [
+                            "CFBundleTypeRole": "Editor",
+                            "CFBundleURLSchemes": ["com.googleusercontent.apps.711006035349-eec6sk24kp81hr622roopaccnakqh6s6"]
+                        ]
+                    ]
+                ]),
+                resources: ["Resources/**"],
                 dependencies: [
                     .core(testing: .Authentication)
                 ]
             )
         ),
-
+        
     ]
 )

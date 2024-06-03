@@ -20,15 +20,9 @@ let targets: [Target] = [
                             ]
                         ]
                     ],
-                    "NSFaceIDUsageDescription": "Please authenticate to proceed.",
-                    "CFBundleURLTypes": [
-                        [
-                            "CFBundleTypeRole": "Editor",
-                            "CFBundleURLSchemes": ["<REVERSED_CLIENT_ID>"]
-                        ]
-                    ]
+                    "NSFaceIDUsageDescription": "Please authenticate to proceed."
                 ]
-                ),
+            ),
             dependencies: [
                 .feature,
             ]
