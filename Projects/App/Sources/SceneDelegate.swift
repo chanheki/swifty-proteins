@@ -425,58 +425,73 @@ class PasswordRegistrationViewController: UIViewController {
         passwordTextField.isSecureTextEntry = true
         passwordTextField.font = .systemFont(ofSize: 24)
         passwordTextField.textAlignment = .center
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         
-        confirmPasswordTextField = UITextField()
-        confirmPasswordTextField.placeholder = "비밀번호 확인"
-        confirmPasswordTextField.isSecureTextEntry = true
-        confirmPasswordTextField.font = .systemFont(ofSize: 24)
-        confirmPasswordTextField.textAlignment = .center
+        // 숫자 버튼
+        let buttonSpacing: CGFloat = 16 // 버튼 간 간격 설정
+        let buttonWidth = (view.frame.size.width - 48 - (buttonSpacing * 4)) / 3 // 버튼 너비 계산
+        let buttonHeight = buttonWidth // 버튼 높이는 너비와 같게 설정
         
-        // 비밀번호 입력 버튼
-        let buttonSize: CGFloat = 60
-        let buttonSpacing: CGFloat = 16
+        let mainStackView = UIStackView()
+        mainStackView.axis = .vertical
+        mainStackView.spacing = buttonSpacing
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        var x: CGFloat = (view.bounds.width - (buttonSize * 3) - (buttonSpacing * 2)) / 2
-        var y: CGFloat = view.bounds.height - buttonSize - 100
+        // passwordTextField를 담는 subStackView
+        let passwordStackView = UIStackView()
+        passwordStackView.axis = .vertical
+        passwordStackView.addArrangedSubview(passwordTextField)
         
-        for number in 0..<10 {
-            let button = UIButton(type: .system)
-            button.setTitle(String(number), for: .normal)
-            button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
-            button.frame = CGRect(x: x, y: y, width: buttonSize, height: buttonSize)
-            button.addTarget(self, action: #selector(numberButtonTapped(_:)), for: .touchUpInside)
-            view.addSubview(button)
-            passwordButtons.append(button)
-            
-            x += buttonSize + buttonSpacing
-            
-            if number == 9 {
-                x = (view.bounds.width - buttonSize - buttonSpacing) / 2
-                y += buttonSize + buttonSpacing
+        // 숫자 버튼들을 담는 subStackView
+        let buttonStackView = UIStackView()
+        buttonStackView.axis = .vertical
+        buttonStackView.spacing = buttonSpacing
+        
+        let numberButtons = [
+            [7, 8, 9],
+            [4, 5, 6],
+            [1, 2, 3],
+            [0, "*", "취소"]
+        ]
+
+        for row in numberButtons {
+            let rowStackView = UIStackView()
+            rowStackView.axis = .horizontal
+            rowStackView.distribution = .fillEqually
+            rowStackView.spacing = buttonSpacing
+
+            for number in row {
+                let button = UIButton(type: .system)
+                if let numberString = number as? Int {
+                    button.setTitle(String(numberString), for: .normal)
+                } else {
+                    button.setTitle(String(describing: number), for: .normal)
+                }
+                button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+                button.addTarget(self, action: #selector(numberButtonTapped(_:)), for: .touchUpInside)
+                passwordButtons.append(button)
+                rowStackView.addArrangedSubview(button)
             }
+
+            buttonStackView.addArrangedSubview(rowStackView)
         }
         
-        // 삭제 버튼
-        let deleteButton = UIButton(type: .system)
-        deleteButton.setTitle("삭제", for: .normal)
-        deleteButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        deleteButton.frame = CGRect(x: view.bounds.width - buttonSize - buttonSpacing, y: y, width: buttonSize, height: buttonSize)
-        deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
-        view.addSubview(deleteButton)
+        mainStackView.addArrangedSubview(passwordStackView)
+        mainStackView.addArrangedSubview(buttonStackView)
         
-        // 레이아웃 설정
-        let stackView = UIStackView(arrangedSubviews: [passwordTextField, confirmPasswordTextField])
-        stackView.axis = .vertical
-        stackView.spacing = 24
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stackView)
+        view.addSubview(mainStackView)
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50)
+            mainStackView.topAnchor.constraint(equalTo: view.topAnchor),
+            mainStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            mainStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            mainStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
     }
-    
+
+
+
+
     @objc private func numberButtonTapped(_ sender: UIButton) {
         guard let number = sender.titleLabel?.text else { return }
         appendToPasswordField(number)
@@ -491,18 +506,11 @@ class PasswordRegistrationViewController: UIViewController {
             passwordTextField.text?.append(digit)
         }
         
-        if confirmPasswordTextField.text?.count ?? 0 < 4 {
-            confirmPasswordTextField.text?.append(digit)
-        }
     }
     
     private func deleteFromPasswordField() {
         if let text = passwordTextField.text, !text.isEmpty {
             passwordTextField.text?.removeLast()
-        }
-        
-        if let text = confirmPasswordTextField.text, !text.isEmpty {
-            confirmPasswordTextField.text?.removeLast()
         }
     }
 }
