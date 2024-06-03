@@ -7,8 +7,8 @@ let targets: [Target] = [
         factory: .init(
             dependencies: [
                 .shared(implements: .CommonUI),
-                .shared(implements: .DesignSystem),
                 .shared(implements: .Extensions),
+                .shared(implements: .DesignSystem),
                 .shared(implements: .Model),
             ]
         )
