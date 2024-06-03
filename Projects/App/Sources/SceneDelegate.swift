@@ -18,7 +18,7 @@ import GoogleSignIn
 extension SceneDelegate: LaunchScreenViewControllerDelegate {
     func launchScreenDidFinish() {
         
-        clearCoreData()
+//        clearCoreData()
         // 로그인 상태 확인 후 적절한 인증 절차 진행
         if isUserLoggedIn() {
             showMainView()
@@ -127,6 +127,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func moveToPasswordRegisteration() {
         // 비밀번호 등록 뷰 컨트롤러 생성
         let PasswordRegistrationViewController = PasswordRegistrationViewController()
+        PasswordRegistrationViewController.delegate = self
         // 비밀번호 등록 뷰 컨트롤러로 이동
         window?.rootViewController = PasswordRegistrationViewController
         window?.makeKeyAndVisible()
@@ -183,8 +184,23 @@ protocol LoginViewControllerDelegate: AnyObject {
     func loginDidFinish(success: Bool, error: Error?)
 }
 
+extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
+    func passwordRegistFinish(success: Bool, error: Error?) {
+        print("passwordRegistFinish")
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("비밀번호 등록 성공")
+            showMainView()
+        } else {
+            // 오류 처리 로직 구현
+            print("비밀번로 등록 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
+}
+
+
 protocol PasswordRegistrationViewControllerDelegate: AnyObject {
-    func loginDidFinish(success: Bool, error: Error?)
+    func passwordRegistFinish(success: Bool, error: Error?)
 }
 
 class LoginViewController: UIViewController {
@@ -208,7 +224,7 @@ class LoginViewController: UIViewController {
         setupLoginLabel()
         setupGoogleLoginButton()
         setupAppleLoginButton()
-        setUpConstraints()
+        setUpView()
         
         // 화면 방향 변경 알림 등록
         NotificationCenter.default.addObserver(
@@ -254,7 +270,7 @@ class LoginViewController: UIViewController {
         NSLayoutConstraint.activate(self.landscapeConstraints)
     }
     
-    private func setUpConstraints() {
+    private func setUpView() {
         // 포트레이트 모드에 대한 제약 조건 설정
         self.portraitContraints = [
             // 예시:
@@ -294,10 +310,6 @@ class LoginViewController: UIViewController {
         loginLabel.textColor = .foregroundColor
         loginLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginLabel) // 뷰에 라벨 추가하는 부분이 빠져있어서 추가했습니다.
-//        NSLayoutConstraint.activate([
-//            loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5)
-//        ])
     }
 
     private func setupGoogleLoginButton() {
@@ -308,13 +320,6 @@ class LoginViewController: UIViewController {
         
         googleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(googleLoginButton)
-        
-//        NSLayoutConstraint.activate([
-//            googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height * 0.66), // 하단 1/3 지점에 위치
-//            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-//            googleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
-//        ])
     }
     
     private func setupAppleLoginButton() {
@@ -322,14 +327,6 @@ class LoginViewController: UIViewController {
         AppleLoginButton.addTarget(self, action: #selector(startAppleSignIn), for: .touchUpInside)
         AppleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(AppleLoginButton)
-        
-        // Google 로그인 버튼 바로 아래에 위치하도록 NSLayoutConstraint 설정
-//        NSLayoutConstraint.activate([
-//            AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
-//            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-//            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
-//        ])
     }
     
     
@@ -403,8 +400,13 @@ class PasswordRegistrationViewController: UIViewController {
     // MARK: - Properties
     weak var delegate: PasswordRegistrationViewControllerDelegate?
     
-    private var passwordTextField: UITextField!
-    private var confirmPasswordTextField: UITextField!
+    var persistentContainer: NSPersistentContainer? {
+          (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
+      }
+
+    
+    var passwordTextField: UITextField!
+    private var passwordConfirmedTextField: UITextField!
     private var passwordButtons: [UIButton] = []
     
     // MARK: - Lifecycle
@@ -416,7 +418,7 @@ class PasswordRegistrationViewController: UIViewController {
     
     // MARK: - Private Methods
     
-    private func setupUI() {
+    public func setupUI() {
         view.backgroundColor = .white
         
         // 비밀번호 입력 필드
@@ -426,6 +428,15 @@ class PasswordRegistrationViewController: UIViewController {
         passwordTextField.font = .systemFont(ofSize: 24)
         passwordTextField.textAlignment = .center
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        
+        // passwordConfirmedTextField 생성
+        passwordConfirmedTextField = UITextField()
+        passwordConfirmedTextField.placeholder = "비밀번호 확인"
+        passwordConfirmedTextField.isSecureTextEntry = true
+        passwordConfirmedTextField.font = .systemFont(ofSize: 24)
+        passwordConfirmedTextField.textAlignment = .center
+        passwordConfirmedTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordConfirmedTextField.isHidden = true // 초기에는 숨겨둡니다.
         
         // 숫자 버튼
         let buttonSpacing: CGFloat = 16 // 버튼 간 간격 설정
@@ -442,6 +453,9 @@ class PasswordRegistrationViewController: UIViewController {
         passwordStackView.axis = .vertical
         passwordStackView.addArrangedSubview(passwordTextField)
         
+        // passwordConfirmedTextField를 mainStackView에 추가
+        passwordStackView.addArrangedSubview(passwordConfirmedTextField)
+        
         // 숫자 버튼들을 담는 subStackView
         let buttonStackView = UIStackView()
         buttonStackView.axis = .vertical
@@ -451,7 +465,7 @@ class PasswordRegistrationViewController: UIViewController {
             [7, 8, 9],
             [4, 5, 6],
             [1, 2, 3],
-            [0, "*", "취소"]
+            [0, "", "취소"]
         ]
 
         for row in numberButtons {
@@ -489,28 +503,150 @@ class PasswordRegistrationViewController: UIViewController {
         ])
     }
 
-
-
-
     @objc private func numberButtonTapped(_ sender: UIButton) {
         guard let number = sender.titleLabel?.text else { return }
         appendToPasswordField(number)
     }
     
-    @objc private func deleteButtonTapped(_ sender: UIButton) {
-        deleteFromPasswordField()
-    }
-    
-    private func appendToPasswordField(_ digit: String) {
-        if passwordTextField.text?.count ?? 0 < 4 {
-            passwordTextField.text?.append(digit)
+    public func appendToPasswordField(_ digit: String) {
+        if passwordTextField.isHidden == false {
+            if digit == "취소" {
+                deleteFromPasswordField()
+            }
+            else if passwordTextField.text?.count ?? 0 < 4 {
+                passwordTextField.text?.append(digit)
+                if passwordTextField.text?.count == 4 {
+                    // 비밀번호 확인 뷰로 넘어가는 로직 추가
+                    passwordTextField.isHidden = true
+                    passwordConfirmedTextField.isHidden = false
+                }
+            }
+        } else {
+            if digit == "취소" {
+                deleteFromPasswordField()
+            }
+            else if passwordConfirmedTextField.text?.count ?? 0 < 4 {
+                passwordConfirmedTextField.text?.append(digit)
+                if passwordConfirmedTextField.text?.count == 4 {
+                    // 비밀번호 검증 로직
+                    if passwordTextField.text == passwordConfirmedTextField.text {
+                        //CoreData 저장 및 MainView 이동
+                        saveTokensToCoreData(password: passwordTextField.text!)
+                        //비밀번호 등록 완료 확인 모달
+                        let alert = UIAlertController(title: "비밀번호 등록 완료", message: nil, preferredStyle: .alert)
+                        
+                        // 체크표시 이미지 추가
+                        let checkmarkImage = UIImage(systemName: "checkmark.circle.fill")
+                        let checkmarkImageView = UIImageView(image: checkmarkImage)
+                        checkmarkImageView.tintColor = .green
+                        checkmarkImageView.frame = CGRect(x: 20, y: 20, width: 30, height: 30)
+                        alert.view.addSubview(checkmarkImageView)
+                        
+                        self.present(alert, animated: true, completion: nil)
+
+                        // 2초 후에 모달 창 자동 닫기
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            alert.dismiss(animated: true, completion: {
+                                // 2초 대기 후 delegate 메서드 호출
+                                self.delegate?.passwordRegistFinish(success: true, error: nil)
+                            })
+                        }
+                    } else {
+                        passwordTextField.isHidden = false
+                        passwordConfirmedTextField.isHidden = true
+                        passwordTextField.text?.removeAll()
+                        passwordConfirmedTextField.text?.removeAll()
+
+                    }
+                }
+            }
         }
-        
     }
     
-    private func deleteFromPasswordField() {
+    public func deleteFromPasswordField() {
+        if passwordTextField.isHidden == false {
+            if let text = passwordTextField.text, !text.isEmpty {
+                passwordTextField.text?.removeLast()
+            }
+        }
+        else {
+            if let text = passwordConfirmedTextField.text, !text.isEmpty {
+                passwordConfirmedTextField.text?.removeLast()
+            }
+        }
+    }
+    
+    private func saveTokensToCoreData(password: String) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+              let context = persistentContainer?.viewContext else {
+            return
+        }
+
+        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
+            userEntity.password = password
+            
+            do {
+                try context.save()
+                print("Password saved to CoreData")
+            } catch {
+                print("Error saving Tokens to CoreData: \(error.localizedDescription)")
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        } else {
+            print("Failed to create UserEntity object")
+        }
+    }
+}
+
+class PasswordVerifyViewController: PasswordRegistrationViewController {
+    private var passwordToVerify: String?
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+    }
+    
+    @objc private func cancelButtonTapped() {
+        // 취소 버튼 클릭 시 동작
+        dismiss(animated: true, completion: nil)
+    }
+    
+    override func appendToPasswordField(_ digit: String) {
+        if digit == "취소" {
+            deleteFromPasswordField()
+        }
+        else if passwordTextField.text?.count ?? 0 < 4 {
+            passwordTextField.text?.append(digit)
+            if passwordTextField.text?.count == 4 {
+                //
+            }
+        }
+    }
+    
+    override func deleteFromPasswordField() {
         if let text = passwordTextField.text, !text.isEmpty {
             passwordTextField.text?.removeLast()
+        }
+    }
+    
+    func isRightPassword(password : String) -> Bool {
+        guard let userContext = persistentContainer?.viewContext else {
+            return false
+        }
+        
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        
+        do {
+            let userEntities = try userContext.fetch(fetchRequest)
+            
+            // 사용자 엔티티가 존재하고, 입력한 password와 UserEntity의 password가 일치하면 true 반환
+            return !userEntities.isEmpty && userEntities.first?.password == password
+        } catch {
+            print("Error fetching user token: \(error)")
+            return false
         }
     }
 }
