@@ -9,3 +9,5 @@
 @_exported import CoreAuthenticationInterface
 @_exported import CoreNetwork
 @_exported import CoreNetworkInterface
+@_exported import CoreCoreDataProvider
+@_exported import CoreCoreDataProviderInterface
