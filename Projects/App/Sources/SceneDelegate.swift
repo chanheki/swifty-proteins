@@ -6,24 +6,44 @@
 //
 
 import UIKit
-
-import Feature
-import SharedCommonUI
-import Firebase
-import GoogleSignIn
 import AuthenticationServices
 import CoreData
 
+import Feature
+import SharedCommonUI
+
+import Firebase
+import GoogleSignIn
+
 extension SceneDelegate: LaunchScreenViewControllerDelegate {
     func launchScreenDidFinish() {
+        
+        clearCoreData()
         // 로그인 상태 확인 후 적절한 인증 절차 진행
-        if let user = Auth.auth().currentUser {
+        if isUserLoggedIn() {
             showMainView()
         } else {
-            showLoginView()
+//            showLoginView()
+            moveToPasswordRegisteration()
         }
     }
 }
+
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let context = appDelegate.persistentContainer.viewContext
+
+    func clearCoreData() {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "UserEntity")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try context.execute(deleteRequest)
+            try context.save()
+            print("CoreData successfully cleared")
+        } catch {
+            print("Error clearing CoreData: \(error)")
+        }
+    }
 
 // LaunchScreenViewControllerDelegate 프로토콜 정의
 protocol LaunchScreenViewControllerDelegate: AnyObject {
@@ -36,7 +56,8 @@ extension SceneDelegate: LoginViewControllerDelegate {
         if success {
             // 로그인 성공 후 메인 화면 표시 로직 구현
             print("로그인 성공")
-            showMainView()
+//            showMainView()
+            moveToPasswordRegisteration()
         } else {
             // 오류 처리 로직 구현
             print("로그인 실패: \(String(describing: error?.localizedDescription))")
@@ -49,8 +70,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var coverViewManager: CoverViewManager?
     var biometricFlow: BiometricAuthenticationFlow?
     var persistentContainer: NSPersistentContainer? {
-          (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
-      }
+        (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
+    }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -103,6 +124,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
     
+    func moveToPasswordRegisteration() {
+        // 비밀번호 등록 뷰 컨트롤러 생성
+        let PasswordRegistrationViewController = PasswordRegistrationViewController()
+        // 비밀번호 등록 뷰 컨트롤러로 이동
+        window?.rootViewController = PasswordRegistrationViewController
+        window?.makeKeyAndVisible()
+    }
+    
     func sceneWillResignActive(_ scene: UIScene) {
         // 홈 버튼 두 번 눌러 앱이 비활성화될 때 커버 뷰 추가
         coverViewManager?.addCoverView()
@@ -141,42 +170,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         do {
             let userEntities = try userContext.fetch(fetchRequest)
             
-            if let userEntity = userEntities.first,
-               let email = userEntity.email,
-               let accessToken = userEntity.accessToken,
-               let refreshToken = userEntity.refreshToken {
-                return !email.isEmpty && !accessToken.isEmpty && !refreshToken.isEmpty
-            }
+            // 사용자 엔티티가 존재하면 로그인 상태로 간주
+            return !userEntities.isEmpty
         } catch {
             print("Error fetching user token: \(error)")
-        }
-        
-        return false
-    }
-    
-    private func saveTokensToCoreData(_ accessToken: String, _ refreshToken: String) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-              let context = persistentContainer?.viewContext else {
-            return
-        }
-        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
-            userEntity.accessToken = accessToken
-            userEntity.refreshToken = refreshToken
-
-            do {
-                try context.save()
-                print("AccessToken and RefreshToken saved to CoreData")
-            } catch {
-                print("Error saving Tokens to CoreData: \(error.localizedDescription)")
-            }
-        } else {
-            print("Failed to create UserEntity object")
+            return false
         }
     }
 }
-
 // 로그인 성공 후 콜백 처리를 위한 프로토콜
 protocol LoginViewControllerDelegate: AnyObject {
+    func loginDidFinish(success: Bool, error: Error?)
+}
+
+protocol PasswordRegistrationViewControllerDelegate: AnyObject {
     func loginDidFinish(success: Bool, error: Error?)
 }
 
@@ -189,9 +196,11 @@ class LoginViewController: UIViewController {
     weak var delegate: LoginViewControllerDelegate?
     
     // Google 로그인 버튼
-    private var googleLoginButton: GIDSignInButton! // UIButton 대신 GIDSignInButton 사용
-    private var AppleLoginButton : ASAuthorizationAppleIDButton!
-    private var loginLabel : UILabel!
+    private var googleLoginButton = GIDSignInButton() // UIButton 대신 GIDSignInButton 사용
+    private var AppleLoginButton = ASAuthorizationAppleIDButton()
+    private var loginLabel = UILabel()
+    private var landscapeConstraints: [NSLayoutConstraint] = []
+    private var portraitContraints: [NSLayoutConstraint] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -199,10 +208,85 @@ class LoginViewController: UIViewController {
         setupLoginLabel()
         setupGoogleLoginButton()
         setupAppleLoginButton()
+        setUpConstraints()
+        
+        // 화면 방향 변경 알림 등록
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOrientationChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+
+        // 초기 화면 방향에 맞춰 제약 조건 적용
+        handleOrientationChange()
+    }
+
+    @objc private func handleOrientationChange() {
+        if interfaceOrientation.isPortrait {
+            applyPortraitConstraints()
+        } else {
+            applyLandscapeConstraints()
+        }
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            if UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown {
+                self?.applyPortraitConstraints()
+            } else {
+                self?.applyLandscapeConstraints()
+            }
+        }, completion: nil)
+    }
+
+    // 세로 화면
+    func applyPortraitConstraints() {
+        NSLayoutConstraint.deactivate(self.landscapeConstraints)
+        NSLayoutConstraint.activate(self.portraitContraints)
+    }
+
+    // 가로 화면
+    func applyLandscapeConstraints() {
+        NSLayoutConstraint.deactivate(self.portraitContraints)
+        NSLayoutConstraint.activate(self.landscapeConstraints)
+    }
+    
+    private func setUpConstraints() {
+        // 포트레이트 모드에 대한 제약 조건 설정
+        self.portraitContraints = [
+            // 예시:
+            loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5),
+            googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height * 0.66), // 하단 1/3 지점에 위치
+            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+            googleLoginButton.heightAnchor.constraint(equalToConstant: 50), // 버튼의 높이를 50포인트로 설정
+            AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+        ]
+        
+        // 랜드스케이프 모드에 대한 제약 조건 설정
+        self.landscapeConstraints = [
+            // 예시:
+            loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width / 5),
+            googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width * 0.66), // 하단 1/3 지점에 위치
+            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+            googleLoginButton.heightAnchor.constraint(equalToConstant: 50), // 버튼의 높이를 50포인트로 설정
+            AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+        ]
     }
     
     private func setupLoginLabel() {
-        let loginLabel = UILabel()
         loginLabel.text = "Swifty Proteins"
         loginLabel.textAlignment = .center
         loginLabel.font = UIFontMetrics(forTextStyle: .title1)
@@ -210,15 +294,14 @@ class LoginViewController: UIViewController {
         loginLabel.textColor = .foregroundColor
         loginLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loginLabel) // 뷰에 라벨 추가하는 부분이 빠져있어서 추가했습니다.
-        NSLayoutConstraint.activate([
-            loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5)
-        ])
+//        NSLayoutConstraint.activate([
+//            loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5)
+//        ])
     }
 
     private func setupGoogleLoginButton() {
         // Google 로그인 버튼 설정
-        googleLoginButton = GIDSignInButton() // GIDSignInButton 인스턴스 생성
         googleLoginButton.colorScheme = .dark
         googleLoginButton.style = .wide // 버튼 스타일 설정, 필요에 따라 변경 가능
         googleLoginButton.addTarget(self, action: #selector(startGoogleSignIn), for: .touchUpInside)
@@ -226,28 +309,27 @@ class LoginViewController: UIViewController {
         googleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(googleLoginButton)
         
-        NSLayoutConstraint.activate([
-            googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height * 0.66), // 하단 1/3 지점에 위치
-            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            googleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
-        ])
+//        NSLayoutConstraint.activate([
+//            googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height * 0.66), // 하단 1/3 지점에 위치
+//            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+//            googleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+//        ])
     }
     
     private func setupAppleLoginButton() {
         // Apple 로그인 버튼 설정
-        AppleLoginButton = ASAuthorizationAppleIDButton()
         AppleLoginButton.addTarget(self, action: #selector(startAppleSignIn), for: .touchUpInside)
         AppleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(AppleLoginButton)
         
         // Google 로그인 버튼 바로 아래에 위치하도록 NSLayoutConstraint 설정
-        NSLayoutConstraint.activate([
-            AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
-            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
-        ])
+//        NSLayoutConstraint.activate([
+//            AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+//            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
+//            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+//        ])
     }
     
     
@@ -283,8 +365,8 @@ class LoginViewController: UIViewController {
                 print("Firebase Sign-In Success: \(String(describing: authResult?.user.email))")
                 
                 // accessToken과 refreshToken을 CoreData에 저장하는 코드
-                self?.saveTokensToCoreData(_email: (authResult?.user.email)!, authentication.accessToken, authentication.refreshToken)
-                
+//                self?.saveTokensToCoreData(_email: (authResult?.user.email)!, authentication.accessToken, authentication.refreshToken)
+                // 비밀번호 생성 뷰로 이동
                 self?.delegate?.loginDidFinish(success: true, error: nil)
             }
         }
@@ -293,20 +375,134 @@ class LoginViewController: UIViewController {
     @objc private func startAppleSignIn() {
     }
     
-    private func saveTokensToCoreData(_email: String, _ accessToken: String, _ refreshToken: String) {
+    private func saveTokensToCoreData(_password: String) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
               let context = persistentContainer?.viewContext else {
             return
         }
 
+        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
+            userEntity.password = _password
+            
             do {
                 try context.save()
-                print("AccessToken and RefreshToken saved to CoreData")
+                print("AccessToken, RefreshToken and Email saved to CoreData")
             } catch {
                 print("Error saving Tokens to CoreData: \(error.localizedDescription)")
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
+        } else {
+            print("Failed to create UserEntity object")
         }
+    }
+}
 
+class PasswordRegistrationViewController: UIViewController {
+    
+    // MARK: - Properties
+    weak var delegate: PasswordRegistrationViewControllerDelegate?
+    
+    private var passwordTextField: UITextField!
+    private var confirmPasswordTextField: UITextField!
+    private var passwordButtons: [UIButton] = []
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupUI() {
+        view.backgroundColor = .white
+        
+        // 비밀번호 입력 필드
+        passwordTextField = UITextField()
+        passwordTextField.placeholder = "비밀번호 입력"
+        passwordTextField.isSecureTextEntry = true
+        passwordTextField.font = .systemFont(ofSize: 24)
+        passwordTextField.textAlignment = .center
+        
+        confirmPasswordTextField = UITextField()
+        confirmPasswordTextField.placeholder = "비밀번호 확인"
+        confirmPasswordTextField.isSecureTextEntry = true
+        confirmPasswordTextField.font = .systemFont(ofSize: 24)
+        confirmPasswordTextField.textAlignment = .center
+        
+        // 비밀번호 입력 버튼
+        let buttonSize: CGFloat = 60
+        let buttonSpacing: CGFloat = 16
+        
+        var x: CGFloat = (view.bounds.width - (buttonSize * 3) - (buttonSpacing * 2)) / 2
+        var y: CGFloat = view.bounds.height - buttonSize - 100
+        
+        for number in 0..<10 {
+            let button = UIButton(type: .system)
+            button.setTitle(String(number), for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+            button.frame = CGRect(x: x, y: y, width: buttonSize, height: buttonSize)
+            button.addTarget(self, action: #selector(numberButtonTapped(_:)), for: .touchUpInside)
+            view.addSubview(button)
+            passwordButtons.append(button)
+            
+            x += buttonSize + buttonSpacing
+            
+            if number == 9 {
+                x = (view.bounds.width - buttonSize - buttonSpacing) / 2
+                y += buttonSize + buttonSpacing
+            }
+        }
+        
+        // 삭제 버튼
+        let deleteButton = UIButton(type: .system)
+        deleteButton.setTitle("삭제", for: .normal)
+        deleteButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        deleteButton.frame = CGRect(x: view.bounds.width - buttonSize - buttonSpacing, y: y, width: buttonSize, height: buttonSize)
+        deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
+        view.addSubview(deleteButton)
+        
+        // 레이아웃 설정
+        let stackView = UIStackView(arrangedSubviews: [passwordTextField, confirmPasswordTextField])
+        stackView.axis = .vertical
+        stackView.spacing = 24
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50)
+        ])
+    }
+    
+    @objc private func numberButtonTapped(_ sender: UIButton) {
+        guard let number = sender.titleLabel?.text else { return }
+        appendToPasswordField(number)
+    }
+    
+    @objc private func deleteButtonTapped(_ sender: UIButton) {
+        deleteFromPasswordField()
+    }
+    
+    private func appendToPasswordField(_ digit: String) {
+        if passwordTextField.text?.count ?? 0 < 4 {
+            passwordTextField.text?.append(digit)
+        }
+        
+        if confirmPasswordTextField.text?.count ?? 0 < 4 {
+            confirmPasswordTextField.text?.append(digit)
+        }
+    }
+    
+    private func deleteFromPasswordField() {
+        if let text = passwordTextField.text, !text.isEmpty {
+            passwordTextField.text?.removeLast()
+        }
+        
+        if let text = confirmPasswordTextField.text, !text.isEmpty {
+            confirmPasswordTextField.text?.removeLast()
+        }
+    }
 }
