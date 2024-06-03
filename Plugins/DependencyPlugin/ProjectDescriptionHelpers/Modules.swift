@@ -40,6 +40,7 @@ public extension ModulePath {
 
 public extension ModulePath {
     enum Domain: String, CaseIterable {
+        case Authentication
         case Biometric
         case Proteins
 
@@ -51,6 +52,7 @@ public extension ModulePath {
 
 public extension ModulePath {
     enum Core: String, CaseIterable {
+        case CoreDataProvider
         case Authentication
         case Network
 
