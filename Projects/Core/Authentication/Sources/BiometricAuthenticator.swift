@@ -5,13 +5,12 @@
 //  Created by Chan on 4/1/24.
 //
 
+import UIKit
+
+import Alamofire
+
 import LocalAuthentication
 import CoreAuthenticationInterface
-import FirebaseCoreInternal
-import UIKit
-import Alamofire
-//import SwiftyJSON
-//import SVProgressHUD
 
 public final class BiometricAuthenticator: AuthenticationInterface {
     public init() {}
