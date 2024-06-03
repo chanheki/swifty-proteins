@@ -12,6 +12,7 @@ let project = Project.makeModule(
         .core(
             implements: .Authentication,
             factory: .init(
+                resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .Authentication),
                     .external(name: "FirebaseAnalytics"),
@@ -33,6 +34,7 @@ let project = Project.makeModule(
                 ]
             )
         ),
+
         .core(
             testing: .Authentication,
             factory: .init(
@@ -52,7 +54,6 @@ let project = Project.makeModule(
                         ]
                     ]
                 ]),
-                resources: ["Resources/**"],
                 dependencies: [
                     .core(testing: .Authentication)
                 ]
