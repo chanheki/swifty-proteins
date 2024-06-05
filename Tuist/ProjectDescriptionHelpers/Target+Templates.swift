@@ -41,7 +41,7 @@ public struct TargetFactory {
         productName: String? = nil,
         bundleId: String? = nil,
         deploymentTargets: DeploymentTargets? = nil,
-        infoPlist: InfoPlist? = .default,
+        infoPlist: InfoPlist? = nil,
         sources: SourceFilesList? = .sources,
         resources: ResourceFileElements? = nil,
         copyFiles: [CopyFilesAction]? = nil,
@@ -104,7 +104,7 @@ public extension Target {
             productName: factory.productName,
             bundleId: factory.bundleId ?? Project.Environment.bundlePrefix + ".\(factory.name)",
             deploymentTargets: factory.deploymentTargets,
-            infoPlist: factory.infoPlist,
+            infoPlist: factory.infoPlist ?? .default,
             sources: factory.sources,
             resources: factory.resources,
             copyFiles: factory.copyFiles,
@@ -117,7 +117,7 @@ public extension Target {
             environmentVariables: factory.environmentVariables,
             launchArguments: factory.launchArguments,
             additionalFiles: factory.additionalFiles,
-            buildRules: [],
+            buildRules: factory.buildRules,
             mergedBinaryType: factory.mergedBinaryType,
             mergeable: factory.mergeable
         )

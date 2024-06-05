@@ -7,8 +7,9 @@ let targets: [Target] = [
         factory: .init(
             dependencies: [
                 .core(implements: .Authentication),
+                .core(implements: .CoreDataProvider),
                 .core(implements: .Network),
-                .shared
+                .shared,
             ]
         )
     )

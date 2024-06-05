@@ -8,6 +8,9 @@ gen:
 	tuist generate
 
 clean:
+	rm -rf Tuist/Package.resolved
+	rm -rf ~/.tuist/Cache
+	rm -rf ~/Library/Caches/tuist
 	tuist clean
 
 fclean: clean
@@ -19,6 +22,10 @@ fclean: clean
 	find . -name "Derived" -exec rm -rf {} +
 
 re: fclean gen
+
+# ---- graph ---- #
+graph:
+	tuist graph --skip-external-dependencies
 
 # ---- test ---- #
 

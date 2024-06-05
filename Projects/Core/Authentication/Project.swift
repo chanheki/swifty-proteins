@@ -4,29 +4,26 @@ import DependencyPlugin
 
 let project = Project.makeModule(
     name: ModulePath.Core.name+ModulePath.Core.Authentication.rawValue,
-    targets: [    
+    targets: [
         .core(
             interface: .Authentication,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .shared
+                ]
+            )
         ),
         .core(
             implements: .Authentication,
             factory: .init(
+                resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .Authentication),
-                    .external(name: "FirebaseAnalytics"),
+                    .core(interface: .CoreDataProvider),
                     .external(name: "FirebaseAppCheck"),
-                    .external(name: "FirebaseAnalyticsOnDeviceConversion"),
-                    .external(name: "FirebaseAnalyticsWithoutAdIdSupport"),
                     .external(name: "FirebaseAppDistribution-Beta"),
+                    .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAuthCombine-Community"),
-                    .external(name: "FirebaseCrashlytics"),
-                    .external(name: "FirebaseDatabaseSwift"),
-                    .external(name: "FirebaseDynamicLinks"),
-                    .external(name: "FirebaseFirestoreCombine-Community"),
-                    .external(name: "FirebaseDatabase"),
-                    .external(name: "FirebaseMessaging"),
-                    .external(name: "FirebaseStorage"),
                     .external(name: "Alamofire"),
                     .external(name: "GoogleSignIn"),
                     .external(name: "GoogleSignInSwift"),
@@ -49,6 +46,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-
+        
     ]
 )

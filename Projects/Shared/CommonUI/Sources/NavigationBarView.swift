@@ -14,6 +14,7 @@ public final class NavigationBar: UIView {
     public var addButton = UIButton()
     public var moreButton = UIButton()
     public var doneButton = UIButton()
+    public var userButton = UIButton()
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -40,12 +41,16 @@ public final class NavigationBar: UIView {
         self.doneButton.configuration = .plain()
         self.doneButton.configuration?.baseForegroundColor = .label
         self.doneButton.configuration?.attributedTitle = AttributedString("완료", attributes: AttributeContainer([NSAttributedString.Key.font: UIFont.pretendard(ofSize: 16, weight: .semiBold)]))
+        self.userButton.configuration = .plain()
+        self.userButton.configuration?.image = UIImage(systemName: "person.crop.circle")
+        self.userButton.configuration?.preferredSymbolConfigurationForImage = .init(weight: .semibold)
         
         addSubview(backButton)
         addSubview(titleLabel)
         addSubview(addButton)
         addSubview(moreButton)
         addSubview(doneButton)
+        addSubview(userButton)
     }
     
     private func setupLayout() {
@@ -54,6 +59,7 @@ public final class NavigationBar: UIView {
         addButton.translatesAutoresizingMaskIntoConstraints = false
         moreButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.translatesAutoresizingMaskIntoConstraints = false
+        userButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             // NavigationBar Layout
@@ -74,6 +80,12 @@ public final class NavigationBar: UIView {
             moreButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             moreButton.widthAnchor.constraint(equalToConstant: 24),
             moreButton.heightAnchor.constraint(equalToConstant: 24),
+            
+            // moreButton Layout
+            userButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            userButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            userButton.widthAnchor.constraint(equalToConstant: 24),
+            userButton.heightAnchor.constraint(equalToConstant: 24),
             
             // addButton Layout
             addButton.trailingAnchor.constraint(equalTo: moreButton.leadingAnchor, constant: -20),

@@ -24,13 +24,13 @@ let targets: [Target] = [
                     "CFBundleURLTypes": [
                         [
                             "CFBundleTypeRole": "Editor",
-                            "CFBundleURLSchemes": ["<REVERSED_CLIENT_ID>"]
+                            "CFBundleURLSchemes": ["com.googleusercontent.apps.711006035349-eec6sk24kp81hr622roopaccnakqh6s6"]
                         ]
                     ]
                 ]
-                ),
+            ),
             dependencies: [
-                .feature,
+                .feature
             ]
         )
     ),
