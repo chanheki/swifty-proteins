@@ -7,7 +7,11 @@ let project = Project.makeModule(
     targets: [    
         .core(
             interface: .CoreDataProvider,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .shared
+                ]
+            )
         ),
         .core(
             implements: .CoreDataProvider,
