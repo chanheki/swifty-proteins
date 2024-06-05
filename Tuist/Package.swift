@@ -8,7 +8,6 @@ let packageSettings = PackageSettings(
     productTypes: [
         "Lottie": .framework,
         "AlamofireDynamic": .framework,
-        "Alamofire": .framework,
         "Firebase" : .framework,
         "GoogleSignIn" : .framework,
         "GoogleUtilities" : .framework,

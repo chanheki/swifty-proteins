@@ -10,7 +10,6 @@ import UIKit
 import Domain
 
 public final class ProteinsListView: UIView {
-    
     var proteinsTableView: ProteinsListTableView!
     var viewModel: LigandsListViewModel
     

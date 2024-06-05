@@ -29,6 +29,7 @@ public extension ModulePath {
 // MARK: FeatureModule
 public extension ModulePath {
     enum Feature: String, CaseIterable {
+        case Settings
         case Authentication
         case Proteins
 
@@ -40,6 +41,8 @@ public extension ModulePath {
 
 public extension ModulePath {
     enum Domain: String, CaseIterable {
+        case Settings
+        case Authentication
         case Biometric
         case Proteins
 
@@ -51,6 +54,7 @@ public extension ModulePath {
 
 public extension ModulePath {
     enum Core: String, CaseIterable {
+        case CoreDataProvider
         case Authentication
         case Network
 

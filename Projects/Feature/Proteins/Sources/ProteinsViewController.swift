@@ -54,7 +54,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self = self else { return }
-                self.activityIndicator.stopAnimating()
                 if let data = data {
                     self.dataLabel.text = "Data loaded: \(data.count) bytes"
                 }
@@ -78,6 +77,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
                 guard let self = self, let scene = scene else { return }
                 let proteinsView = self.contentView as! ProteinsView
                 proteinsView.sceneView.scene = scene
+                self.activityIndicator.stopAnimating()
                 // testable identifier for Test
                 proteinsView.sceneView.accessibilityIdentifier = "sceneView"
             }
