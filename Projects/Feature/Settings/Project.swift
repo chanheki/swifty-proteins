@@ -1,41 +1,39 @@
-import ProjectDescription
 import ProjectDescriptionHelpers
+import ProjectDescription
 import DependencyPlugin
 
 let project = Project.makeModule(
-    name: ModulePath.Core.name+ModulePath.Core.Network.rawValue,
+    name: ModulePath.Feature.name+ModulePath.Feature.Settings.rawValue,
     targets: [    
-        .core(
-            interface: .Network,
+        .feature(
+            interface: .Settings,
             factory: .init(
                 dependencies: [
-                    .shared
+                    .domain
                 ]
             )
         ),
-        .core(
-            implements: .Network,
+        .feature(
+            implements: .Settings,
             factory: .init(
                 dependencies: [
-                    .core(interface: .Network),
-                    .external(name: "AlamofireDynamic")
+                    .feature(interface: .Settings)
                 ]
             )
         ),
-    
-        .core(
-            testing: .Network,
+        .feature(
+            testing: .Settings,
             factory: .init(
                 dependencies: [
-                    .core(interface: .Network)
+                    .feature(interface: .Settings)
                 ]
             )
         ),
-        .core(
-            tests: .Network,
+        .feature(
+            tests: .Settings,
             factory: .init(
                 dependencies: [
-                    .core(testing: .Network)
+                    .feature(testing: .Settings)
                 ]
             )
         ),

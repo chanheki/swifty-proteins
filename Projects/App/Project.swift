@@ -30,7 +30,7 @@ let targets: [Target] = [
                 ]
             ),
             dependencies: [
-                .feature,
+                .feature
             ]
         )
     ),

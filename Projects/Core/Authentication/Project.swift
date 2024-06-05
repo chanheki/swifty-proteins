@@ -7,7 +7,11 @@ let project = Project.makeModule(
     targets: [
         .core(
             interface: .Authentication,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .shared
+                ]
+            )
         ),
         .core(
             implements: .Authentication,
@@ -16,19 +20,10 @@ let project = Project.makeModule(
                 dependencies: [
                     .core(interface: .Authentication),
                     .core(interface: .CoreDataProvider),
-                    .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAppCheck"),
-                    .external(name: "FirebaseAnalyticsOnDeviceConversion"),
-                    .external(name: "FirebaseAnalyticsWithoutAdIdSupport"),
                     .external(name: "FirebaseAppDistribution-Beta"),
+                    .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAuthCombine-Community"),
-                    .external(name: "FirebaseCrashlytics"),
-                    .external(name: "FirebaseDatabaseSwift"),
-                    .external(name: "FirebaseDynamicLinks"),
-                    .external(name: "FirebaseFirestoreCombine-Community"),
-                    .external(name: "FirebaseDatabase"),
-                    .external(name: "FirebaseMessaging"),
-                    .external(name: "FirebaseStorage"),
                     .external(name: "Alamofire"),
                     .external(name: "GoogleSignIn"),
                     .external(name: "GoogleSignInSwift"),
