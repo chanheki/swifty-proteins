@@ -6,9 +6,10 @@ let targets: [Target] = [
     .core(
         factory: .init(
             dependencies: [
+                .shared,
                 .core(implements: .Authentication),
+                .core(implements: .CoreDataProvider),
                 .core(implements: .Network),
-                .shared
             ]
         )
     )

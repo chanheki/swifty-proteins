@@ -28,7 +28,7 @@ let targets: [Target] = [
                         ]
                     ]
                 ]
-                ),
+            ),
             dependencies: [
                 .feature,
             ]

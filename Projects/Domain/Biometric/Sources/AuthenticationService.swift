@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Core
+import CoreAuthenticationInterface
 
 public final class AuthenticationService {
     private let authenticator: AuthenticationInterface
