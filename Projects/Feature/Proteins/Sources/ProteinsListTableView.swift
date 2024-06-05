@@ -7,19 +7,16 @@
 
 import UIKit
 
+import FeatureProteinsInterface
 import Domain
 import SharedExtensions
-
-protocol ProteinsListTableViewDelegate: AnyObject {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
-}
 
 // ProteinsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
 public final class ProteinsListTableView: UITableView {
     
     private var viewModel: LigandsListViewModel
     weak var selectionDelegate: ProteinsListTableViewDelegate?
-
+    
     init(frame: CGRect, style: UITableView.Style, viewModel: LigandsListViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame, style: style)
@@ -45,17 +42,16 @@ public final class ProteinsListTableView: UITableView {
     }
     
     private func commonInit() {
-        register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        separatorStyle = .singleLine
-        backgroundColor = .backgroundColor
-      
-        // 섹션 헤더
-        sectionHeaderTopPadding = 0
+        self.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        self.separatorStyle = .singleLine
+        self.backgroundColor = .backgroundColor
         
+        // 섹션 헤더
+        self.sectionHeaderTopPadding = 0
         // 섹션 인덱스 스타일 설정
-        sectionIndexColor = .foregroundColor
-        sectionIndexBackgroundColor = .clear
-        sectionIndexTrackingBackgroundColor = .lightGray.withAlphaComponent(0.6)
+        self.sectionIndexColor = .foregroundColor
+        self.sectionIndexBackgroundColor = .clear
+        self.sectionIndexTrackingBackgroundColor = .lightGray.withAlphaComponent(0.6)
     }
     
     private func dataDelegateInit() {
@@ -105,5 +101,13 @@ extension ProteinsListTableView: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectionDelegate?.tableView(tableView, didSelectRowAt: indexPath)
     }
+    
+}
 
+extension ProteinsListTableView: UIScrollViewDelegate {
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        selectionDelegate?.scrollViewDidScroll(scrollView)
+    }
+    
 }

@@ -23,6 +23,10 @@ fclean: clean
 
 re: fclean gen
 
+# ---- graph ---- #
+graph:
+	tuist graph --skip-external-dependencies
+
 # ---- test ---- #
 
 test:
