@@ -14,11 +14,12 @@ import SharedCommonUI
 
 import Firebase
 import GoogleSignIn
+import Lottie
 
 extension SceneDelegate: LaunchScreenViewControllerDelegate {
     func launchScreenDidFinish() {
         
-//        clearCoreData()
+        clearCoreData()
         // 로그인 상태 확인 후 적절한 인증 절차 진행
         if isUserLoggedIn() {
             showMainView()
@@ -50,20 +51,9 @@ protocol LaunchScreenViewControllerDelegate: AnyObject {
     func launchScreenDidFinish()
 }
 
-// SceneDelegate가 LoginViewControllerDelegate 프로토콜을 준수하도록 확장
-extension SceneDelegate: LoginViewControllerDelegate {
-    func loginDidFinish(success: Bool, error: Error?) {
-        if success {
-            // 로그인 성공 후 메인 화면 표시 로직 구현
-            print("로그인 성공")
-//            showMainView()
-            moveToPasswordRegisteration()
-        } else {
-            // 오류 처리 로직 구현
-            print("로그인 실패: \(String(describing: error?.localizedDescription))")
-        }
-    }
-}
+
+
+    
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -107,6 +97,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let loginViewController = LoginViewController()
         loginViewController.delegate = self // 로그인 성공 후 콜백 처리를 위해 델리게이트 설정 필요
         window?.rootViewController = loginViewController
+        window?.makeKeyAndVisible()
+    }
+    
+    func showPasswordRegistrationView() {
+        let passwordRegistrationViewController = PasswordRegistrationViewController()
+        passwordRegistrationViewController.delegate = self
+        window?.rootViewController = passwordRegistrationViewController
+        window?.makeKeyAndVisible()
+    }
+    
+    func showLoginSuccessView() {
+        let loginSuccessViewController = PasswordRegistrationSuccessViewController()
+        loginSuccessViewController.delegate = self // 로그인 성공 후 콜백 처리를 위해 델리게이트 설정 필요
+        window?.rootViewController = loginSuccessViewController
         window?.makeKeyAndVisible()
     }
     
@@ -181,16 +185,38 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 // 로그인 성공 후 콜백 처리를 위한 프로토콜
 protocol LoginViewControllerDelegate: AnyObject {
-    func loginDidFinish(success: Bool, error: Error?)
+    func oauthLoginDidFinish(success: Bool, error: Error?)
+}
+
+protocol PasswordRegistrationViewControllerDelegate: AnyObject {
+    func passwordRegistDidFinish(success: Bool, error: Error?)
+}
+
+protocol PasswordRegistrationSuccessViewControllerDelegate: AnyObject {
+    func userRegistDidFinish(success: Bool, error: Error?)
+}
+
+// SceneDelegate가 LoginViewControllerDelegate 프로토콜을 준수하도록 확장
+extension SceneDelegate: LoginViewControllerDelegate {
+    func oauthLoginDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("로그인 성공")
+            showPasswordRegistrationView()
+        } else {
+            // 오류 처리 로직 구현
+            print("로그인 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
 }
 
 extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
-    func passwordRegistFinish(success: Bool, error: Error?) {
-        print("passwordRegistFinish")
+    func passwordRegistDidFinish(success: Bool, error: Error?) {
         if success {
             // 로그인 성공 후 메인 화면 표시 로직 구현
             print("비밀번호 등록 성공")
-            showMainView()
+            showLoginSuccessView()
+            
         } else {
             // 오류 처리 로직 구현
             print("비밀번로 등록 실패: \(String(describing: error?.localizedDescription))")
@@ -198,10 +224,20 @@ extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
     }
 }
 
-
-protocol PasswordRegistrationViewControllerDelegate: AnyObject {
-    func passwordRegistFinish(success: Bool, error: Error?)
+extension SceneDelegate: PasswordRegistrationSuccessViewControllerDelegate {
+    func userRegistDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("전체 로그인 성공")
+            showMainView()
+            
+        } else {
+            // 오류 처리 로직 구현
+            print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
 }
+
 
 class LoginViewController: UIViewController {
     var persistentContainer: NSPersistentContainer? {
@@ -278,12 +314,12 @@ class LoginViewController: UIViewController {
             loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5),
             googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height * 0.66), // 하단 1/3 지점에 위치
-            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            googleLoginButton.heightAnchor.constraint(equalToConstant: 50), // 버튼의 높이를 50포인트로 설정
+            googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
+            googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
-            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+            AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
+            AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
         
         // 랜드스케이프 모드에 대한 제약 조건 설정
@@ -293,12 +329,12 @@ class LoginViewController: UIViewController {
             loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width / 5),
             googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width * 0.66), // 하단 1/3 지점에 위치
-            googleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            googleLoginButton.heightAnchor.constraint(equalToConstant: 50), // 버튼의 높이를 50포인트로 설정
+            googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
+            googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
-            AppleLoginButton.widthAnchor.constraint(equalToConstant: 280), // 버튼의 너비를 280포인트로 설정
-            AppleLoginButton.heightAnchor.constraint(equalToConstant: 50) // 버튼의 높이를 50포인트로 설정
+            AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
+            AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
     }
     
@@ -340,13 +376,13 @@ class LoginViewController: UIViewController {
         GIDSignIn.sharedInstance.signIn(with: config, presenting: self) { [weak self] user, error in
             if let error = error {
                 print("Google Sign-In Error: \(error.localizedDescription)")
-                self?.delegate?.loginDidFinish(success: false, error: error)
+                self?.delegate?.oauthLoginDidFinish(success: false, error: error)
                 return
             }
             
             guard let authentication = user?.authentication, let idToken = authentication.idToken else {
                 print("Google Sign-In Error: Missing ID Token")
-                self?.delegate?.loginDidFinish(success: false, error: error)
+                self?.delegate?.oauthLoginDidFinish(success: false, error: error)
                 return
             }
             
@@ -354,7 +390,7 @@ class LoginViewController: UIViewController {
             Auth.auth().signIn(with: credential) { [weak self] authResult, error in
                 if let error = error {
                     print("Firebase Sign-In Error: \(error.localizedDescription)")
-                    self?.delegate?.loginDidFinish(success: false, error: error)
+                    self?.delegate?.oauthLoginDidFinish(success: false, error: error)
                     return
                 }
                 
@@ -364,7 +400,7 @@ class LoginViewController: UIViewController {
                 // accessToken과 refreshToken을 CoreData에 저장하는 코드
 //                self?.saveTokensToCoreData(_email: (authResult?.user.email)!, authentication.accessToken, authentication.refreshToken)
                 // 비밀번호 생성 뷰로 이동
-                self?.delegate?.loginDidFinish(success: true, error: nil)
+                self?.delegate?.oauthLoginDidFinish(success: true, error: nil)
             }
         }
     }
@@ -395,7 +431,7 @@ class LoginViewController: UIViewController {
     }
 }
 
-class PasswordRegistrationViewController: UIViewController {
+open class PasswordRegistrationViewController: UIViewController {
     
     // MARK: - Properties
     weak var delegate: PasswordRegistrationViewControllerDelegate?
@@ -405,20 +441,20 @@ class PasswordRegistrationViewController: UIViewController {
       }
 
     
-    var passwordTextField: UITextField!
-    private var passwordConfirmedTextField: UITextField!
-    private var passwordButtons: [UIButton] = []
+    open var passwordTextField: UITextField!
+    open var passwordConfirmedTextField: UITextField!
+    open var passwordButtons: [UIButton] = []
     
     // MARK: - Lifecycle
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
     
     // MARK: - Private Methods
     
-    public func setupUI() {
+    open func setupUI() {
         view.backgroundColor = .white
         
         // 비밀번호 입력 필드
@@ -441,7 +477,7 @@ class PasswordRegistrationViewController: UIViewController {
         // 숫자 버튼
         let buttonSpacing: CGFloat = 16 // 버튼 간 간격 설정
         let buttonWidth = (view.frame.size.width - 48 - (buttonSpacing * 4)) / 3 // 버튼 너비 계산
-        let buttonHeight = buttonWidth // 버튼 높이는 너비와 같게 설정
+        _ = buttonWidth // 버튼 높이는 너비와 같게 설정
         
         let mainStackView = UIStackView()
         mainStackView.axis = .vertical
@@ -465,7 +501,7 @@ class PasswordRegistrationViewController: UIViewController {
             [7, 8, 9],
             [4, 5, 6],
             [1, 2, 3],
-            [0, "", "취소"]
+            [0, nil, "취소"]
         ]
 
         for row in numberButtons {
@@ -476,15 +512,20 @@ class PasswordRegistrationViewController: UIViewController {
 
             for number in row {
                 let button = UIButton(type: .system)
-                if let numberString = number as? Int {
+                if number as? String != nil {
+                    button.setImage(UIImage(systemName: "delete.left"), for: .normal)
+//                    self.setButtonProperties(_button: button, _rowStackView: rowStackView)
+                    button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+                    button.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
+                    passwordButtons.append(button)
+                    rowStackView.addArrangedSubview(button)
+                } else if let numberString = number as? Int {
                     button.setTitle(String(numberString), for: .normal)
+                    self.setNumberButtonProperties(_button: button, _rowStackView: rowStackView)
                 } else {
-                    button.setTitle(String(describing: number), for: .normal)
+                    self.setNumberButtonProperties(_button: button, _rowStackView: rowStackView)
                 }
-                button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
-                button.addTarget(self, action: #selector(numberButtonTapped(_:)), for: .touchUpInside)
-                passwordButtons.append(button)
-                rowStackView.addArrangedSubview(button)
+                
             }
 
             buttonStackView.addArrangedSubview(rowStackView)
@@ -502,18 +543,30 @@ class PasswordRegistrationViewController: UIViewController {
             mainStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
     }
+    
+    open func setNumberButtonProperties(_button : UIButton, _rowStackView : UIStackView) {
+        _button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+        _button.addTarget(self, action: #selector(numberButtonTapped(_:)), for: .touchUpInside)
+        passwordButtons.append(_button)
+        _rowStackView.addArrangedSubview(_button)
+    }
 
     @objc private func numberButtonTapped(_ sender: UIButton) {
         guard let number = sender.titleLabel?.text else { return }
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
         appendToPasswordField(number)
+    }
+    
+    @objc private func deleteButtonTapped(_ sender: UIButton) {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+        deleteFromPasswordField()
     }
     
     public func appendToPasswordField(_ digit: String) {
         if passwordTextField.isHidden == false {
-            if digit == "취소" {
-                deleteFromPasswordField()
-            }
-            else if passwordTextField.text?.count ?? 0 < 4 {
+            if passwordTextField.text?.count ?? 0 < 4 {
                 passwordTextField.text?.append(digit)
                 if passwordTextField.text?.count == 4 {
                     // 비밀번호 확인 뷰로 넘어가는 로직 추가
@@ -521,42 +574,21 @@ class PasswordRegistrationViewController: UIViewController {
                     passwordConfirmedTextField.isHidden = false
                 }
             }
-        } else {
-            if digit == "취소" {
-                deleteFromPasswordField()
-            }
-            else if passwordConfirmedTextField.text?.count ?? 0 < 4 {
+        }else {
+            if passwordConfirmedTextField.text?.count ?? 0 < 4 {
                 passwordConfirmedTextField.text?.append(digit)
                 if passwordConfirmedTextField.text?.count == 4 {
                     // 비밀번호 검증 로직
                     if passwordTextField.text == passwordConfirmedTextField.text {
                         //CoreData 저장 및 MainView 이동
                         saveTokensToCoreData(password: passwordTextField.text!)
-                        //비밀번호 등록 완료 확인 모달
-                        let alert = UIAlertController(title: "비밀번호 등록 완료", message: nil, preferredStyle: .alert)
+                        self.delegate?.passwordRegistDidFinish(success: true, error: nil)
                         
-                        // 체크표시 이미지 추가
-                        let checkmarkImage = UIImage(systemName: "checkmark.circle.fill")
-                        let checkmarkImageView = UIImageView(image: checkmarkImage)
-                        checkmarkImageView.tintColor = .green
-                        checkmarkImageView.frame = CGRect(x: 20, y: 20, width: 30, height: 30)
-                        alert.view.addSubview(checkmarkImageView)
-                        
-                        self.present(alert, animated: true, completion: nil)
-
-                        // 2초 후에 모달 창 자동 닫기
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            alert.dismiss(animated: true, completion: {
-                                // 2초 대기 후 delegate 메서드 호출
-                                self.delegate?.passwordRegistFinish(success: true, error: nil)
-                            })
-                        }
                     } else {
                         passwordTextField.isHidden = false
                         passwordConfirmedTextField.isHidden = true
                         passwordTextField.text?.removeAll()
                         passwordConfirmedTextField.text?.removeAll()
-
                     }
                 }
             }
@@ -599,36 +631,186 @@ class PasswordRegistrationViewController: UIViewController {
     }
 }
 
-class PasswordVerifyViewController: PasswordRegistrationViewController {
-    private var passwordToVerify: String?
+class PasswordRegistrationSuccessViewController: UIViewController {
+    
+    // MARK: - Properties
+    weak var delegate: PasswordRegistrationSuccessViewControllerDelegate?
+    private var isAutoCloseEnabled = true
+    
+    // UI 요소들 선언
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "비밀번호 등록 완료"
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let messageLabel: UILabel = {
+        let label = UILabel()
+        label.text = "축하합니다! 비밀번호 등록이 완료되었습니다.\n 10초 뒤에 자동으로 홈 화면으로 이동됩니다."
+        label.font = .systemFont(ofSize: 16)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    private let doneButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("확인", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 8
+        button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+        return button
+    }()
     
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        
+        // 10초 후에 자동으로 사라지게 함
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+            [weak self] in
+            guard let self = self, self.isAutoCloseEnabled else { return }
+            self.delegate?.userRegistDidFinish(success: true, error: nil)
+        }
     }
     
-    @objc private func cancelButtonTapped() {
-        // 취소 버튼 클릭 시 동작
-        dismiss(animated: true, completion: nil)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // 로그인 완료 알림을 위한 UI 애니메이션 적용
+        showLoginCompletionUIAnimation()
+        
+        // 로그인 완료 알림을 위한 Lottie 애니메이션 적용
+        showLoginCompletionAnimation()
+    }
+    
+    private func showLoginCompletionUIAnimation() {
+        // 로그인 완료 후 UI 업데이트 (예: 타이틀 라벨, 메시지 라벨, 완료 버튼 등의 애니메이션 효과 적용)
+        titleLabel.alpha = 0
+        titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        messageLabel.alpha = 0
+        messageLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        doneButton.alpha = 0
+        doneButton.transform = CGAffineTransform(translationX: 0, y: view.bounds.height)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.3, options: [.curveEaseInOut]) {
+            self.titleLabel.alpha = 1
+            self.titleLabel.transform = .identity
+            self.messageLabel.alpha = 1
+            self.messageLabel.transform = .identity
+            self.doneButton.alpha = 1
+            self.doneButton.transform = .identity
+        }
+    }
+
+    private func showLoginCompletionAnimation() {
+        // 'login_success' 애니메이션 파일 불러오기
+        guard let animationView = LottieAnimation.named("checkbox") else {
+            return
+        }
+        
+        let lottieAnimationView = LottieAnimationView(animation: animationView)
+        lottieAnimationView.backgroundColor = .backgroundColor
+        lottieAnimationView.contentMode = .scaleAspectFit
+        lottieAnimationView.loopMode = .playOnce
+        lottieAnimationView.animationSpeed = 1.0
+        
+        // Lottie 애니메이션 뷰를 기존 뷰 위에 올려놓기
+        view.addSubview(lottieAnimationView)
+        lottieAnimationView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            lottieAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lottieAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            lottieAnimationView.widthAnchor.constraint(equalToConstant: 300),
+            lottieAnimationView.heightAnchor.constraint(equalToConstant: 300)
+
+        ])
+        
+        lottieAnimationView.play { [weak self] _ in
+            // 애니메이션 완료 후 다음 단계 처리
+//            self?.handleLoginCompletionAnimation()
+        }
+    }
+
+    private func handleLoginCompletionAnimation() {
+        // 로그인 완료 후 UI 업데이트 (예: 타이틀 라벨, 메시지 라벨, 완료 버튼 등의 애니메이션 효과 적용)
+        titleLabel.transform = CGAffineTransform(translationX: -view.bounds.width, y: 0)
+        messageLabel.transform = CGAffineTransform(translationX: view.bounds.width, y: 0)
+        doneButton.transform = CGAffineTransform(translationX: 0, y: view.bounds.height)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseIn, .allowUserInteraction]) {
+            self.titleLabel.transform = .identity
+            self.messageLabel.transform = .identity
+            self.doneButton.transform = .identity
+        }
+    }
+
+    
+    
+    // MARK: - UI Setup
+    
+    func setupUI() {
+        view.backgroundColor = .white
+        
+        view.addSubview(titleLabel)
+        view.addSubview(messageLabel)
+        view.addSubview(doneButton)
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        messageLabel.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            messageLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            messageLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
+            doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            doneButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func doneButtonTapped() {
+        // 확인 버튼 클릭 시 처리할 로직
+        isAutoCloseEnabled = false
+        delegate?.userRegistDidFinish(success: true, error: nil)
+    }
+}
+
+
+class PasswordVerifyViewController: PasswordRegistrationViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
     }
     
     override func appendToPasswordField(_ digit: String) {
-        if digit == "취소" {
-            deleteFromPasswordField()
-        }
-        else if passwordTextField.text?.count ?? 0 < 4 {
+        if passwordTextField.text?.count ?? 0 < 4 {
             passwordTextField.text?.append(digit)
             if passwordTextField.text?.count == 4 {
-                //
+                if self.isRightPassword(password: passwordTextField.text!) == true {
+                    // 성공
+                } else {
+                    passwordTextField.text?.removeAll()
+                    //에러 UIView
+                }
             }
-        }
-    }
-    
-    override func deleteFromPasswordField() {
-        if let text = passwordTextField.text, !text.isEmpty {
-            passwordTextField.text?.removeLast()
         }
     }
     

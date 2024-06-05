@@ -7,9 +7,10 @@
 
 import LocalAuthentication
 import CoreAuthenticationInterface
-import FirebaseCoreInternal
 import UIKit
 import Alamofire
+import FirebaseCore
+
 //import SwiftyJSON
 //import SVProgressHUD
 
