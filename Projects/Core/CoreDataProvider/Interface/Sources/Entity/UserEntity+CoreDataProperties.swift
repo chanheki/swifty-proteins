@@ -20,5 +20,6 @@ extension UserEntity {
     @NSManaged public var email: String?
     @NSManaged public var id: UUID?
     @NSManaged public var refreshToken: String?
+    @NSManaged public var password: String?
 
 }
