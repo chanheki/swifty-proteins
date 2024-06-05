@@ -6,6 +6,6 @@
 //
 
 // LaunchScreenViewControllerDelegate 프로토콜 정의
-protocol LaunchScreenViewControllerDelegate: AnyObject {
+public protocol LaunchScreenViewControllerDelegate: AnyObject {
     func launchScreenDidFinish()
 }
