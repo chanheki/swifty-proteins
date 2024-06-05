@@ -52,6 +52,7 @@ open class BaseViewController<View: UIView>: UIViewController {
         setNavigationBarBackButtonHidden(true)
         setNavigationBarMenuButtonHidden(true)
         setNavigationBarDoneButtonHidden(true)
+        setNavigationBarUserButtonHidden(false)
         
         navigationBar.backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         
@@ -122,13 +123,13 @@ open class BaseViewController<View: UIView>: UIViewController {
         if hidden {
             // backButton이 숨겨져 있을 때 titleLabel의 제약 조건 업데이트
             NSLayoutConstraint.activate([
-                navigationBar.titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 30),
+                navigationBar.titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor),
                 navigationBar.titleLabel.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor)
             ])
         } else {
             // backButton이 보여질 때 titleLabel의 제약 조건 업데이트
             NSLayoutConstraint.activate([
-                navigationBar.titleLabel.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor),
+                navigationBar.titleLabel.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor, constant: 60),
                 navigationBar.titleLabel.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor)
             ])
         }
@@ -160,6 +161,10 @@ open class BaseViewController<View: UIView>: UIViewController {
         navigationBar.doneButton.isHidden = hidden
     }
     
+    func setNavigationBarUserButtonHidden(_ hidden: Bool) {
+        navigationBar.userButton.isHidden = hidden
+    }
+    
     func setNavigationBarAddButtonAction(_ selector: Selector) {
         navigationBar.addButton.addTarget(self, action: selector, for: .touchUpInside)
     }
@@ -169,6 +174,10 @@ open class BaseViewController<View: UIView>: UIViewController {
     }
     
     func setNavigationBarDoneButtonAction(_ selector: Selector) {
+        navigationBar.doneButton.addTarget(self, action: selector, for: .touchUpInside)
+    }
+    
+    func setNavigationBarUserButtonAction(_ selector: Selector) {
         navigationBar.doneButton.addTarget(self, action: selector, for: .touchUpInside)
     }
     
