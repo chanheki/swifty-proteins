@@ -9,14 +9,18 @@ import UIKit
 import AuthenticationServices
 import CoreData
 
+import Firebase
+
 import Feature
+//import FeatureAuthenticationInterface
 import SharedCommonUI
 
 import Firebase
 import GoogleSignIn
 import Lottie
 
-extension SceneDelegate: LaunchScreenViewControllerDelegate {
+extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewControllerDelegate {
+    // LaunchScreenViewControllerDelegate
     func launchScreenDidFinish() {
         
         clearCoreData()
@@ -59,9 +63,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     var coverViewManager: CoverViewManager?
     var biometricFlow: BiometricAuthenticationFlow?
-    var persistentContainer: NSPersistentContainer? {
-        (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer
-    }
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }

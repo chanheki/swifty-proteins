@@ -4,7 +4,7 @@ import DependencyPlugin
 
 let project = Project.makeModule(
     name: ModulePath.Core.name+ModulePath.Core.Authentication.rawValue,
-    targets: [    
+    targets: [
         .core(
             interface: .Authentication,
             factory: .init()
@@ -12,8 +12,11 @@ let project = Project.makeModule(
         .core(
             implements: .Authentication,
             factory: .init(
+                resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .Authentication),
+                    .core(interface: .CoreDataProvider),
+                    .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAppCheck"),
                     .external(name: "FirebaseAppDistribution-Beta"),
                     .external(name: "FirebaseAnalytics"),
@@ -40,6 +43,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-
+        
     ]
 )
