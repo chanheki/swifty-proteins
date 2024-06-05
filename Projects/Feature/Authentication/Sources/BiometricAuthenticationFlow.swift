@@ -1,5 +1,5 @@
 //
-//  SceneDelegate.swift
+//  BiometricAuthenticationFlow.swift
 //  SwiftyProteins
 //
 //  Created by Chan on 3/28/24.
