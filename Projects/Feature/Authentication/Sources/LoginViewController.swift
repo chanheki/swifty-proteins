@@ -12,6 +12,7 @@ import AuthenticationServices
 import GoogleSignIn
 
 import FeatureAuthenticationInterface
+import DomainAuthenticationInterface
 import CoreAuthentication
 import CoreCoreDataProvider
 import SharedCommonUI
@@ -21,10 +22,23 @@ public final class LoginViewController: UIViewController {
     // Delegate property
     public weak var delegate: LoginViewControllerDelegate?
     
+    // AuthenticationService property
+    private var authService: AuthenticationService
+    
     // Google 로그인 버튼
     private var googleLoginButton: GIDSignInButton!
     private var AppleLoginButton: ASAuthorizationAppleIDButton!
     private var loginLabel: UILabel!
+    
+    // 생성자에서 authService를 주입받음
+    public init(authService: AuthenticationService) {
+        self.authService = authService
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,6 +113,16 @@ public final class LoginViewController: UIViewController {
     }
     
     @objc private func startAppleSignIn() {
-        // Apple Sign-In 로직을 추가합니다.
+        DispatchQueue.main.async {
+            self.authService.appleSignIn(presentingViewController: self) { [weak self] success, error in
+                if let error = error {
+                    self?.delegate?.loginDidFinish(success: false, error: error)
+                    return
+                }
+                
+                self?.delegate?.loginDidFinish(success: true, error: nil)
+            }
+        }
     }
+    
 }
