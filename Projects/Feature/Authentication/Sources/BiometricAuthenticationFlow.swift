@@ -19,23 +19,11 @@ public final class BiometricAuthenticationFlow {
     
     public func start(completion: @escaping (Bool, Error?) -> Void) {
         let authenticator = BiometricAuthenticator()
-        let authService = AuthenticationService(authenticator: authenticator)
+        let authService = BiometricAuthenticationService(authenticator: authenticator)
         authService.authenticate { success, error in
             DispatchQueue.main.async {
                 completion(success, error)
             }
-        }
-    }
-    
-    public func showMainViewController() {
-        window?.rootViewController?.view.backgroundColor = .green
-    }
-    
-    public func showFailureViewController(error: Error?) {
-        window?.rootViewController?.view.backgroundColor = .red
-        
-        if let error = error {
-            print("Authentication failed with error: \(error.localizedDescription)")
         }
     }
 }
