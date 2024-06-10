@@ -9,6 +9,7 @@ import UIKit
 import Combine
 
 import FeatureProteinsInterface
+import FeatureSettings
 import DomainProteins
 import SharedCommonUI
 import SharedExtensions
@@ -18,9 +19,12 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
     private var viewModel: LigandsListViewModel?
     private var cancellables: Set<AnyCancellable> = []
     
+    private var userButtonView: UserButtonView!
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        bindViewModel()
+        
+        self.bindViewModel()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -87,18 +91,20 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
         self.configureSearchController(delegate: self, navigationItem: navigationItem)
         
         // UserButton 생성
-        let userButton = UIButton(type: .custom)
-        userButton.setImage(UIImage(systemName: "person.crop.circle"), for: .normal)
-        userButton.tintColor = .systemBlue
-        userButton.addTarget(self, action: #selector(userButtonTapped), for: .touchUpInside)
+        self.setupUserButtonView()
         
-        // UserButton을 UIBarButtonItem으로 변환
-        let userBarButtonItem = UIBarButtonItem(customView: userButton)
+        return self.navigationController!
+    }
+    
+    private func setupUserButtonView() {
+        self.userButtonView = UserButtonView()
+        self.userButtonView.addTarget(self, action: #selector(userButtonTapped), for: .touchUpInside)
+        
+        // UserButtonView를 UIBarButtonItem으로 변환
+        let userBarButtonItem = UIBarButtonItem(customView: self.userButtonView)
         
         // navigationItem의 rightBarButtonItem으로 설정
         self.navigationItem.rightBarButtonItem = userBarButtonItem
-        
-        return self.navigationController!
     }
     
     // 현재 프로틴 리스트 컨트롤러를 네비게이션 컨트롤러의 루트로 설정
@@ -116,9 +122,9 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
     }
     
     @objc private func userButtonTapped() {
-        let proteinsViewController = ProteinsViewController()
+        let settingViewController = SettingsViewController()
         
-        navigationController?.pushViewController(proteinsViewController, animated: true)
+        navigationController?.pushViewController(settingViewController, animated: true)
     }
 }
 
@@ -146,6 +152,8 @@ extension ProteinsListViewController: ProteinsListTableViewDelegate {
             proteinsViewController.setNavigationBarTitleLabelText(ligand.identifier)
             navigationController?.pushViewController(proteinsViewController, animated: true)
         }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     // 스크롤 뷰 델리게이트 메서드
@@ -155,8 +163,15 @@ extension ProteinsListViewController: ProteinsListTableViewDelegate {
         
         if offsetY > largeTitleHeight {
             self.navigationItem.largeTitleDisplayMode = .never
+            self.userButtonView.isLarge = false
         } else {
             self.navigationItem.largeTitleDisplayMode = .always
+            self.userButtonView.isLarge = true
         }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.navigationController?.navigationBar.layoutIfNeeded()
+        }
+        
     }
 }
