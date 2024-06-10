@@ -14,40 +14,35 @@ import SharedModel
 
 public class SettingsViewController: BaseViewController<SettingsView> {
     
-    private let viewModel = SettingsViewModel()
+    private var viewModel: SettingsViewModel?
     private var cancellables = Set<AnyCancellable>()
-    
-    private let activityIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        return indicator
-    }()
-    
-    private let dataLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        return label
-    }()
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         setupNavigationBar()
         setupProperty()
-        setupView()
         
         bindViewModel()
     }
     
     private func bindViewModel() {
+        guard let settingsView = self.contentView as? SettingsView else {
+            return
+        }
         
+        if let viewModel = viewModel {
+            viewModel
+                .$settings
+                .receive(on: RunLoop.main)
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    settingsView.settingListTableView.reloadData()
+                }
+                .store(in: &cancellables)
+        }
     }
-
-    private func fetchData(liganName: String) {
-        
-    }
+    
     
     // MARK: - BaseViewControllerProtocol
     
@@ -56,22 +51,50 @@ public class SettingsViewController: BaseViewController<SettingsView> {
     }
     
     public override func setupProperty() {
+        if let settingsListView = self.contentView as? SettingsView {
+            viewModel = settingsListView.viewModel
+            settingsListView.settingListTableView.selectionDelegate = self
+        }
+        
         view.backgroundColor = .backgroundColor
-        self.activityIndicator.startAnimating()
+        self.title = "Settings"
     }
     
-    private func setupView() {
-        view.addSubview(activityIndicator)
-        view.addSubview(dataLabel)
-        
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            
-            dataLabel.topAnchor.constraint(equalTo: activityIndicator.bottomAnchor, constant: 20),
-            dataLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            dataLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
-        ])
-    }
 }
 
+extension SettingsViewController: SettingsListTableViewDelegate {
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let viewModel = viewModel else { return }
+        
+        let setting = viewModel.settings[indexPath.row]
+        
+        switch setting {
+        case .id:
+            // ID 확인 로직
+            break
+            
+        case .resetPassword:
+            // 비밀번호 재설정 뷰 컨트롤러로 이동
+            let resetPasswordVC = SettingsViewController()
+            navigationController?.pushViewController(resetPasswordVC, animated: true)
+            
+        case .biometric:
+            // 생체 인식 설정 로직 (스위치로 처리)
+            break
+            
+        case .logout:
+            viewModel.performAction(for: .logout)
+            // 로그아웃 후 보여질 view 설정.
+            break
+        case .unsubscribe:
+            // 삭제전 보여질 view 설정
+            viewModel.performAction(for: .unsubscribe)
+            // 삭제 후 보여질 view 설정
+            break
+        }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+}

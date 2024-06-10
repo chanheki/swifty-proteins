@@ -8,7 +8,7 @@
 import Foundation
 import CoreAuthenticationInterface
 
-public final class AuthenticationService {
+public final class BiometricAuthenticationService {
     private let authenticator: AuthenticationInterface
     
     public init(authenticator: AuthenticationInterface) {

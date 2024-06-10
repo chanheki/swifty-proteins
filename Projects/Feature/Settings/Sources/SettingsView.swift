@@ -11,7 +11,7 @@ import DomainSettings
 
 public final class SettingsView: UIView {
     
-    var UserSettingTableView: SettingsListTableView!
+    var settingListTableView: SettingsListTableView!
     var viewModel: SettingsViewModel
     
     override init(frame: CGRect) {
@@ -35,18 +35,18 @@ public final class SettingsView: UIView {
     }
     
     private func commonInit() {
-        UserSettingTableView = SettingsListTableView(frame: .zero, style: .plain, viewModel: viewModel)
+        self.settingListTableView = SettingsListTableView(frame: .zero, style: .plain, viewModel: viewModel)
     }
     
     private func setupView() {
-        addSubview(UserSettingTableView)
+        addSubview(self.settingListTableView)
         
-        UserSettingTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.settingListTableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            UserSettingTableView.topAnchor.constraint(equalTo: self.topAnchor),
-            UserSettingTableView.leftAnchor.constraint(equalTo: self.leftAnchor),
-            UserSettingTableView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            UserSettingTableView.rightAnchor.constraint(equalTo: self.rightAnchor)
+            self.settingListTableView.topAnchor.constraint(equalTo: self.topAnchor),
+            self.settingListTableView.leftAnchor.constraint(equalTo: self.leftAnchor),
+            self.settingListTableView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            self.settingListTableView.rightAnchor.constraint(equalTo: self.rightAnchor)
         ])
     }
 }
