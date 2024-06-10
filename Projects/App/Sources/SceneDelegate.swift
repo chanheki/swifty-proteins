@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 import Feature
-//import FeatureAuthenticationInterface
+import DomainAuthentication
 import SharedCommonUI
 
 extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewControllerDelegate {
@@ -72,8 +72,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func showLoginView() {
+        let authService = AuthenticationManager()
+
         // 로그인 뷰 컨트롤러 생성 및 설정
-        let loginViewController = LoginViewController()
+        let loginViewController = LoginViewController(authService: authService)
         loginViewController.delegate = self // 로그인 성공 후 콜백 처리를 위해 델리게이트 설정 필요
         window?.rootViewController = loginViewController
         window?.makeKeyAndVisible()
