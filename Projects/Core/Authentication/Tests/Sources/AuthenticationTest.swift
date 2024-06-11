@@ -15,7 +15,7 @@ class AuthenticationServiceTests: XCTestCase {
     func testAuthenticationSuccess() {
         // Given
         let mockAuthenticator = MockAuthenticator(shouldAuthenticateSuccessfully: true)
-        let authenticationService = AuthenticationService(authenticator: mockAuthenticator)
+        let authenticationService = BiometricAuthenticationService(authenticator: mockAuthenticator)
         
         // When
         let expectation = self.expectation(description: "Authentication should succeed")
@@ -32,7 +32,7 @@ class AuthenticationServiceTests: XCTestCase {
     func testAuthenticationFailure() {
         // Given
         let mockAuthenticator = MockAuthenticator(shouldAuthenticateSuccessfully: false, error: NSError(domain: "Test", code: 1, userInfo: nil))
-        let authenticationService = AuthenticationService(authenticator: mockAuthenticator)
+        let authenticationService = BiometricAuthenticationService(authenticator: mockAuthenticator)
         
         // When
         let expectation = self.expectation(description: "Authentication should fail")

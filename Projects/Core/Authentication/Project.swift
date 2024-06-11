@@ -7,7 +7,11 @@ let project = Project.makeModule(
     targets: [
         .core(
             interface: .Authentication,
-            factory: .init()
+            factory: .init(
+                dependencies: [
+                    .shared
+                ]
+            )
         ),
         .core(
             implements: .Authentication,
@@ -16,7 +20,6 @@ let project = Project.makeModule(
                 dependencies: [
                     .core(interface: .Authentication),
                     .core(interface: .CoreDataProvider),
-                    .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAppCheck"),
                     .external(name: "FirebaseAppDistribution-Beta"),
                     .external(name: "FirebaseAnalytics"),
