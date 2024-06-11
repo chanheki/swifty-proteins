@@ -9,20 +9,21 @@ import Combine
 
 import Shared
 
-public class LigandsListViewModel {
+public final class LigandsListViewModel {
     
+    // 앞글자 section
     @Published public var ligandsBySection: [String: [Ligand]] = [:]
+    // 검색된 Ligands
+    @Published public var filteredLigands: [Ligand] = [] {
+        didSet {
+            self.organizeLigandsIntoSections()
+        }
+    }
     // Full ligands
     public var ligands: [Ligand] = []
     // 섹션별로 정렬된 Ligands
     // 섹션 타이틀 배열
     public var sectionTitles: [String] = []
-    // 검색된 Ligands
-    public var filteredLigands: [Ligand] = [] {
-        didSet {
-            self.organizeLigandsIntoSections()
-        }
-    }
     
     public init() {
         self.ligands = loadLigands()

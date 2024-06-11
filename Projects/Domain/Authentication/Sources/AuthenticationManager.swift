@@ -5,12 +5,15 @@
 //  Created by Chan on 4/1/24.
 //
 
-import CoreCoreDataProvider
+import UIKit
 
-public final class AuthenticationManager {
+import DomainAuthenticationInterface
+import CoreCoreDataProvider
+import CoreAuthentication
+
+public final class AuthenticationManager: AuthenticationService {
     
-    public static let shared = AuthenticationManager()
-    private init() {}
+    public init() {}
     
     public func saveTokensToCoreData(_ email: String, _ accessToken: String, _ refreshToken: String) {
         _ = CoreDataProvider.shared.createUserEntity(accessToken: accessToken, refreshToken: refreshToken)
@@ -21,5 +24,9 @@ public final class AuthenticationManager {
             return true
         }
         return false
+    }
+    
+    public func appleSignIn(presentingViewController: UIViewController, completion: @escaping (Bool, Error?) -> Void) {
+        AppleOAuthManager.shared.startSignInWithAppleFlow(presentingViewController: presentingViewController, completion: completion)
     }
 }

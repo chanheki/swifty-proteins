@@ -138,6 +138,7 @@ public extension Target {
             newFactory.name = Project.Environment.appName
             newFactory.bundleId = Project.Environment.bundlePrefix
             newFactory.resources = ["Resources/**"]
+            newFactory.entitlements = "Resources/SwiftyProteins.entitlements"
             newFactory.productName = "SwiftyProteins"
             return make(factory: newFactory)
         }

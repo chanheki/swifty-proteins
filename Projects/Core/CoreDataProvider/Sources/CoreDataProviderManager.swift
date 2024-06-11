@@ -53,8 +53,8 @@ public final class CoreDataProvider {
         let context = persistentContainer.viewContext
         
         if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
-            userEntity.accessToken = accessToken
-            userEntity.refreshToken = refreshToken
+//            userEntity.accessToken = accessToken
+//            userEntity.refreshToken = refreshToken
 
             do {
                 try context.save()
@@ -75,6 +75,7 @@ public final class CoreDataProvider {
         
         if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
             userEntity.password = password
+            
             
             do {
                 try context.save()

@@ -10,3 +10,5 @@
 @_exported import FeatureProteinsTesting
 @_exported import FeatureAuthentication
 @_exported import FeatureAuthenticationInterface
+@_exported import FeatureSettings
+@_exported import FeatureSettingsInterface
