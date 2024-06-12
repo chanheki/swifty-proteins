@@ -159,7 +159,7 @@ public final class LoginViewController: UIViewController {
         DispatchQueue.main.async {
             GoogleOAuthManager.shared.startGoogleSignIn(presenting: self) { [weak self] success, error in
                 if let error = error {
-                    self?.delegate?.oauthLoginDidFinish(success: true, error: nil)
+                    self?.delegate?.oauthLoginDidFinish(success: false, error: error)
                     return
                 }
                 

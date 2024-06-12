@@ -11,8 +11,10 @@ import SceneKit
 
 import DomainProteinsInterface
 import CoreNetwork
+import SharedExtensions
 
 public class LigandViewModel: ObservableObject {
+    public var ligand: LigandModel?
     @Published public var ligandData: Data?
     @Published public var errorMessage: String?
     @Published public var proteinScene: SCNScene?
@@ -20,6 +22,26 @@ public class LigandViewModel: ObservableObject {
     var pdbDataProvider: ProteinsPDBDataProvider?
     
     private var cancellables = Set<AnyCancellable>()
+    
+    private var elementColors: [String: UIColor] = [
+        "C": .green,
+        "O": .red,
+        "N": .blue,
+        "H": .white,
+        "F": .green,
+        "S": .orange,
+        "Other": .gray
+    ]
+    
+    public var ligandInfo: String {
+        guard let data = ligandData else { return "No data available" }
+        return "Ligand data: \(data.count) bytes"
+    }
+    
+    // 원소 목록을 반환하는 프로퍼티
+    public var elements: [String] {
+        return Array(elementColors.keys)
+    }
     
     public init() {}
     
@@ -29,7 +51,7 @@ public class LigandViewModel: ObservableObject {
             case .success(let data):
                 DispatchQueue.main.async {
                     self?.ligandData = data
-                    self?.createProteinScene(from: data)
+                    self?.createBallStickProteinsScene(from: data)
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
@@ -39,28 +61,24 @@ public class LigandViewModel: ObservableObject {
         }
     }
     
-    // public for XCTest
-    public func createProteinScene(from data: Data) {
+    public func createBallStickProteinsScene(from data: Data) {
+        createProteinsScene(from: data, modelType: .ballStick)
+    }
+    
+    public func createSpaceFillingProteinsScene(from data: Data) {
+        createProteinsScene(from: data, modelType: .spaceFilling)
+    }
+    
+    private func createProteinsScene(from data: Data, modelType: ProteinsModelType) {
         guard let pdbDataString = String(data: data, encoding: .utf8) else {
             self.errorMessage = "Failed to convert data to string"
             return
         }
         
-        let (proteinNode, atoms) = parsePDB(pdbData: pdbDataString)
-        let bondNodes = createBonds(from: pdbDataString, atoms: atoms)
+        let proteinNode = SCNNode()
+        let lines = pdbDataString.split(separator: "\n")
         
-        bondNodes.forEach { proteinNode.addChildNode($0) }
-        
-        let scene = SCNScene()
-        scene.rootNode.addChildNode(proteinNode)
-        
-        self.proteinScene = scene
-    }
-    
-    private func parsePDB(pdbData: String) -> (SCNNode, [Int: SCNNode]) {
-        let node = SCNNode()
         var atoms = [Int: SCNNode]()
-        let lines = pdbData.split(separator: "\n")
         
         for line in lines {
             let components = line.split(separator: " ", omittingEmptySubsequences: true)
@@ -71,39 +89,54 @@ public class LigandViewModel: ObservableObject {
                 let z = Float(components[8]) ?? 0.0
                 let element = String(components[11])
                 
-                let atomNode = createAtomNode(element: element, position: SCNVector3(x, y, z))
-                node.addChildNode(atomNode)
+                let atomNode: SCNNode
+                
+                atomNode = createNode(element: element, position: SCNVector3(x, y, z), modelType: modelType)
+                
+                proteinNode.addChildNode(atomNode)
                 atoms[index] = atomNode
             }
         }
         
-        return (node, atoms)
-    }
-    
-    private func createAtomNode(element: String, position: SCNVector3) -> SCNNode {
-        let node = SCNNode()
-        let sphere = SCNSphere(radius: 0.2)
-        
-        switch element {
-        case "C":
-            sphere.firstMaterial?.diffuse.contents = UIColor.green
-        case "O":
-            sphere.firstMaterial?.diffuse.contents = UIColor.red
-        case "N":
-            sphere.firstMaterial?.diffuse.contents = UIColor.blue
-        case "H":
-            sphere.firstMaterial?.diffuse.contents = UIColor.white
-        case "F":
-            sphere.firstMaterial?.diffuse.contents = UIColor.green
-        case "S":
-            sphere.firstMaterial?.diffuse.contents = UIColor.orange
-        default:
-            sphere.firstMaterial?.diffuse.contents = UIColor.gray
+        if modelType == .ballStick {
+            let bondNodes = createBonds(from: pdbDataString, atoms: atoms)
+            bondNodes.forEach { proteinNode.addChildNode($0) }
         }
         
+        let scene = SCNScene()
+        scene.rootNode.addChildNode(proteinNode)
+        self.proteinScene = scene
+        self.proteinScene?.background.contents = UIColor.backgroundColor
+    }
+    
+    private func createNode(element: String, position: SCNVector3, modelType: ProteinsModelType) -> SCNNode {
+        let node = SCNNode()
+        let sphere: SCNSphere
+        switch modelType {
+        case .ballStick:
+            sphere = SCNSphere(radius: 0.2)
+        case .spaceFilling:
+            let radius = getAtomicRadius(for: element)
+            sphere = SCNSphere(radius: radius)
+            
+        }
+        sphere.firstMaterial?.diffuse.contents = elements.contains(element) ? elementColors[element] : elementColors["Other"]
         node.geometry = sphere
         node.position = position
         return node
+    }
+    
+    
+    private func getAtomicRadius(for element: String) -> CGFloat {
+        switch element {
+        case "C": return 1.7
+        case "O": return 1.52
+        case "N": return 1.55
+        case "H": return 1.2
+        case "F": return 1.47
+        case "S": return 1.8
+        default: return 1.5
+        }
     }
     
     private func createBonds(from pdbData: String, atoms: [Int: SCNNode]) -> [SCNNode] {
@@ -150,7 +183,57 @@ public class LigandViewModel: ObservableObject {
         
         let geometry = SCNGeometry(sources: [vertexSource], elements: [element])
         geometry.firstMaterial?.diffuse.contents = UIColor.gray
+        geometry.firstMaterial?.lightingModel = .constant
         
         return SCNNode(geometry: geometry)
     }
+    
+    public func animateToSpaceFillingModel() {
+        guard let proteinScene = proteinScene else { return }
+        animateToModel(proteinScene.rootNode, isSpaceFilling: true)
+    }
+    
+    public func animateToBallStickModel() {
+        guard let proteinScene = proteinScene else { return }
+        animateToModel(proteinScene.rootNode, isSpaceFilling: false)
+    }
+    
+    private func animateToModel(_ node: SCNNode, isSpaceFilling: Bool) {
+        for childNode in node.childNodes {
+            if let geometry = childNode.geometry as? SCNSphere {
+                let element = getElement(from: geometry.firstMaterial?.diffuse.contents as? UIColor)
+                let newRadius = isSpaceFilling ? getAtomicRadius(for: element) : 0.2
+                let action = SCNAction.scale(to: CGFloat(newRadius / 0.2), duration: 0.5)
+                childNode.runAction(action)
+            }
+            animateToModel(childNode, isSpaceFilling: isSpaceFilling)
+        }
+    }
+    
+    private func getElement(from color: UIColor?) -> String {
+        switch color {
+        case UIColor.green: return "C"
+        case UIColor.red: return "O"
+        case UIColor.blue: return "N"
+        case UIColor.white: return "H"
+        case UIColor.orange: return "S"
+        default: return ""
+        }
+    }
+    
+    // 각 원소의 색상 변경 메서드
+    public func updateColor(_ color: UIColor, for element: String) {
+        elementColors[element] = color
+    }
+    
+    // 원소의 현재 색상을 반환하는 메서드
+    public func color(for element: String) -> UIColor {
+        return elementColors[element] ?? UIColor.gray
+    }
+    
+    // SCNScene의 배경색 변경 메서드
+    public func updateBackgroundColor(_ color: UIColor) {
+        proteinScene?.background.contents = color
+    }
+    
 }
