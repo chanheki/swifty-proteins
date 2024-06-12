@@ -10,12 +10,29 @@ import CoreData
 import CoreCoreDataProviderInterface
 
 public final class CoreDataProvider {
-
+    
     public static let shared = CoreDataProvider()
     public init() {}
-
+    
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "UserModel")
+        // 모듈 번들을 가져옴
+        let bundle = Bundle(for: CoreDataProvider.self)
+        // 리소스 번들의 URL을 가져옴
+        guard let resourceBundleURL = bundle.url(forResource: "CoreCoreDataProvider_CoreCoreDataProvider", withExtension: "bundle"),
+              let resourceBundle = Bundle(url: resourceBundleURL) else {
+            fatalError("Failed to locate resource bundle")
+        }
+        // 번들에서 모델 파일의 URL을 가져옴
+        guard let modelURL = resourceBundle.url(forResource: "UserModel", withExtension: "momd") else {
+            fatalError("Failed to find model file in resource bundle")
+        }
+        
+        // 모델 파일을 로드함
+        guard let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL) else {
+            fatalError("Failed to load model file")
+        }
+        
+        let container = NSPersistentContainer(name: "UserModel", managedObjectModel: managedObjectModel)
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -53,9 +70,9 @@ public final class CoreDataProvider {
         let context = persistentContainer.viewContext
         
         if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
-//            userEntity.accessToken = accessToken
-//            userEntity.refreshToken = refreshToken
-
+            //            userEntity.accessToken = accessToken
+            //            userEntity.refreshToken = refreshToken
+            
             do {
                 try context.save()
                 print("AccessToken and RefreshToken saved to CoreData")
@@ -69,7 +86,7 @@ public final class CoreDataProvider {
             return false
         }
     }
-
+    
     public func saveTokensToCoreData(password: String) -> Bool {
         let context = persistentContainer.viewContext
         
@@ -90,7 +107,7 @@ public final class CoreDataProvider {
             return false
         }
     }
-
+    
     public func isRightPassword(password : String) -> Bool {
         let userContext = persistentContainer.viewContext
         
