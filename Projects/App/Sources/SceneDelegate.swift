@@ -25,7 +25,7 @@ extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewController
     }
     
     // LoginViewControllerDelegate
-    func loginDidFinish(success: Bool, error: Error?) {
+    func oauthLoginDidFinish(success: Bool, error: Error?) {
         if success {
             // 로그인 성공 후 메인 화면 표시 로직 구현
             print("로그인 성공")
@@ -89,7 +89,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     self?.coverViewManager?.removeCoverView()
                 } else {
                     // 앱 꺼짐 혹은 재시도 Flow Feature
-                    self?.biometricFlow?.showFailureViewController(error: error)
+//                    self?.biometricFlow?.showFailureViewController(error: error)
+                    print("bio 실패")
                 }
             }
         }
@@ -118,9 +119,5 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.authenticateUser()
         }
     }
-    
-    //    func signInOAuthView(_ scene: UIScene) {
-    //        oauthViewManager?.
-    //    }
 }
 

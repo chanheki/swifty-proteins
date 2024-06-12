@@ -9,8 +9,8 @@ import Firebase
 import GoogleSignIn
 import AuthenticationServices
 
-import CoreCoreDataProvider
-import CoreData
+//import CoreCoreDataProvider
+//import CoreData
 
 public final class GoogleOAuthManager {
     public static let shared = GoogleOAuthManager()
