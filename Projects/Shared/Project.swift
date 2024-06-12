@@ -8,8 +8,7 @@ let targets: [Target] = [
             dependencies: [
                 .shared(implements: .CommonUI),
                 .shared(implements: .Extensions),
-                .shared(implements: .DesignSystem),
-                .shared(implements: .Model),
+                .shared(implements: .DesignSystem)
             ]
         )
     )
