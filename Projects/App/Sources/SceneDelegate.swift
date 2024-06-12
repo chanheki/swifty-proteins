@@ -59,8 +59,8 @@ extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewController
         if authService.isUserLoggedIn() {
             showMainView()
         } else {
-            //            showLoginView()
-            moveToPasswordRegisteration()
+                        showLoginView()
+//            moveToPasswordRegisteration()
         }
     }
     
@@ -151,11 +151,16 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func moveToPasswordRegisteration() {
         // 비밀번호 등록 뷰 컨트롤러 생성
-        let PasswordRegistrationViewController = PasswordRegistrationViewController()
-        PasswordRegistrationViewController.delegate = self
-        // 비밀번호 등록 뷰 컨트롤러로 이동
-        window?.rootViewController = PasswordRegistrationViewController
-        window?.makeKeyAndVisible()
+//        let PasswordRegistrationViewController = PasswordRegistrationViewController()
+//        PasswordRegistrationViewController.delegate = self
+//        // 비밀번호 등록 뷰 컨트롤러로 이동
+//        window?.rootViewController = PasswordRegistrationViewController
+//        window?.makeKeyAndVisible()
+        
+//        let UnsubscribeViewController = DeleteAccountViewController()
+//        UnsubscribeViewController.delegate = self
+//        window?.rootViewController = UnsubscribeViewController
+//        window?.makeKeyAndVisible()
     }
     
     func sceneWillResignActive(_ scene: UIScene) {

@@ -2,6 +2,8 @@ import UIKit
 
 import CoreAuthentication
 import CoreData
+import GoogleSignIn
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
