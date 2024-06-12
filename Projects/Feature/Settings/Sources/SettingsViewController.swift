@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 
+import FeatureSettingsInterface
 import DomainSettings
 import SharedCommonUI
 import SharedModel
