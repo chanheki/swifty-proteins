@@ -52,7 +52,7 @@ public final class CoreDataProvider {
     public func createUserEntity(accessToken: String, refreshToken: String) -> Bool {
         let context = persistentContainer.viewContext
         
-        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
+        if NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) is UserEntity {
 //            userEntity.accessToken = accessToken
 //            userEntity.refreshToken = refreshToken
 
