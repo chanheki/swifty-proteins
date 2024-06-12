@@ -8,6 +8,7 @@ let packageSettings = PackageSettings(
     productTypes: [
         "Lottie": .framework,
         "AlamofireDynamic": .framework,
+        "FirebaseUI": .framework,
         "Firebase" : .framework,
         "GoogleSignIn" : .framework,
         "GoogleUtilities" : .framework,
@@ -22,6 +23,7 @@ let package = Package(
         .package(url: "https://github.com/Alamofire/Alamofire", from: "5.9.0"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "10.27.0"),
         .package(url: "https://github.com/google/GoogleSignIn-iOS", from: "6.0.0"),
-        .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.0")
+        .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.0"),
+        .package(url: "https://github.com/firebase/FirebaseUI-iOS.git", from: "12.2.0")
     ]
 )

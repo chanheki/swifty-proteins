@@ -1,80 +1,66 @@
-//
-//  PasswordRegistrationFailureView.swift
-//  FeatureAuthentication
-//
-//  Created by 민영재 on 6/11/24.
-//
-
 import UIKit
 
 public class PasswordRegistrationFailureView: UIView {
-    
-    // MARK: - Properties
-    
-    // UI 요소들 선언
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "비밀번호 등록 실패"
-        label.font = .systemFont(ofSize: 24, weight: .bold)
-        label.textAlignment = .center
-        return label
-    }()
-    
+    // 이 클래스에서 사용할 UI 요소들을 정의합니다.
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "비밀번호 등록이 실패했습니다."
-        label.font = .systemFont(ofSize: 16)
-        label.textAlignment = .center
-        label.numberOfLines = 0
+        label.text = "비밀번호 등록에 실패했습니다. 다시 시도해주세요."
+        label.textColor = .black
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let doneButton: UIButton = {
+    private let confirmButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("확인", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
-        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .blue
         button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    // MARK: - Initialization
-    
+    // 초기화 메서드
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
+        setupView()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(coder: coder)
+        setupView()
     }
     
-    // MARK: - UI Setup
-    
-    private func setupUI() {
-        backgroundColor = .white
+    private func setupView() {
+        backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.8)
         
-        addSubview(titleLabel)
         addSubview(messageLabel)
-        addSubview(doneButton)
+        addSubview(confirmButton)
         
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        // messageLabel의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            
-            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
-            messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            
-            doneButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            doneButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            doneButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            doneButton.heightAnchor.constraint(equalToConstant: 50)
+            messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
         ])
+        
+        // confirmButton의 레이아웃 제약조건 설정
+        NSLayoutConstraint.activate([
+            confirmButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            confirmButton.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 30),
+            confirmButton.widthAnchor.constraint(equalToConstant: 100),
+            confirmButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        // 확인 버튼 클릭 이벤트 추가
+        confirmButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+        
+        // 화면 밖 터치 시 뷰 사라지게 하는 제스처 추가
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissView))
+        addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func dismissView() {
+        self.removeFromSuperview()
     }
 }

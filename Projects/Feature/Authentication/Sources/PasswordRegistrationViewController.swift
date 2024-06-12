@@ -156,10 +156,17 @@ open class PasswordRegistrationViewController: UIViewController {
                         self.delegate?.passwordRegistDidFinish(success: true, error: nil)
                         
                     } else {
-                        // PasswordRegistrationFailureView 호출
-//                        let failureView = PasswordRegistrationFailureView()
-//                            // 필요한 경우 failureView에 대한 추가 설정 가능
-//                        self.view.addSubview(failureView)
+                        // 비밀번호 등록 실패 시 PasswordRegistrationFailureView 보여주기
+                        let failureView = PasswordRegistrationFailureView(frame: self.view.bounds)
+                        self.view.addSubview(failureView)
+                        failureView.translatesAutoresizingMaskIntoConstraints = false
+                        NSLayoutConstraint.activate([
+                            failureView.topAnchor.constraint(equalTo: self.view.topAnchor),
+                            failureView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+                            failureView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                            failureView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+                        ])
+                        
                         passwordTextField.isHidden = false
                         passwordConfirmedTextField.isHidden = true
                         passwordTextField.text?.removeAll()
