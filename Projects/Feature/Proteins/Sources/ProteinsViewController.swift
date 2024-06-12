@@ -12,7 +12,6 @@ import Combine
 import DomainProteinsInterface
 import DomainProteins
 import SharedCommonUI
-import SharedModel
 
 public class ProteinsViewController: BaseViewController<ProteinsView> {
     var ligand: LigandModel?

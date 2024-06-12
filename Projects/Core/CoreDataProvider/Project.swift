@@ -16,6 +16,7 @@ let project = Project.makeModule(
         .core(
             implements: .CoreDataProvider,
             factory: .init(
+                resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .CoreDataProvider)
                 ]
