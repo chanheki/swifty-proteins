@@ -3,8 +3,6 @@ import XCTest
 @testable import FeatureProteins
 @testable import FeatureProteinsInterface
 @testable import FeatureProteinsTesting
-@testable import SharedModel
-
 
 final class ProteinsTests: XCTestCase {
 

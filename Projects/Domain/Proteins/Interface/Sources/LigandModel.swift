@@ -1,11 +1,11 @@
 //
-//  Ligand.swift
-//  SharedModel
+//  LigandModel.swift
+//  DomainProteinsInterface
 //
-//  Created by Chan on 4/2/24.
+//  Created by Chan on 6/11/24.
 //
 
-public struct Ligand {
+public struct LigandModel {
     public let identifier: String
 
     public init(identifier: String) {
