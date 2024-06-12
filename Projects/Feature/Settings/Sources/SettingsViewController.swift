@@ -11,7 +11,6 @@ import Combine
 import FeatureSettingsInterface
 import DomainSettings
 import SharedCommonUI
-import SharedModel
 
 public class SettingsViewController: BaseViewController<SettingsView> {
     

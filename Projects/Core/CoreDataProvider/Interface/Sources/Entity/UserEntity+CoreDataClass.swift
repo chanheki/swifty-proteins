@@ -2,7 +2,7 @@
 //  UserEntity+CoreDataClass.swift
 //  
 //
-//  Created by Chan on 6/2/24.
+//  Created by Chan on 6/12/24.
 //
 //
 
