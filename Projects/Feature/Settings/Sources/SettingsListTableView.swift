@@ -7,6 +7,7 @@
 
 import UIKit
 
+import FeatureSettingsInterface
 import DomainSettings
 import SharedExtensions
 

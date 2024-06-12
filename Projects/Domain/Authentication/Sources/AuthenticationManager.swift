@@ -20,17 +20,9 @@ public final class AuthenticationManager: AuthenticationService {
     }
     
     public func isUserLoggedIn() -> Bool {
-        guard let userEntities = CoreDataProvider.shared.fetchUserEntity() else {
-            return false
+        if let userEntities = CoreDataProvider.shared.fetchUserEntity() {
+            return true
         }
-        
-        if let userEntity = userEntities.first,
-           let email = userEntity.email,
-           let accessToken = userEntity.accessToken,
-           let refreshToken = userEntity.refreshToken {
-            return !email.isEmpty && !accessToken.isEmpty && !refreshToken.isEmpty
-        }
-        
         return false
     }
     

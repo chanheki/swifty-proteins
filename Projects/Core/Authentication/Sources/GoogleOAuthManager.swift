@@ -9,8 +9,8 @@ import Firebase
 import GoogleSignIn
 import AuthenticationServices
 
-import CoreCoreDataProvider
-import CoreData
+//import CoreCoreDataProvider
+//import CoreData
 
 public final class GoogleOAuthManager {
     public static let shared = GoogleOAuthManager()
@@ -18,7 +18,7 @@ public final class GoogleOAuthManager {
     
     public func firebaseConfig() {
         guard FirebaseApp.app() == nil else { return }
-        let filePath = Bundle.module.path(forResource: "GoogleService-Info", ofType: "plist")!
+        let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!
         let options = FirebaseOptions(contentsOfFile: filePath)
         FirebaseApp.configure(options: options!)
     }

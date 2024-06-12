@@ -6,30 +6,69 @@
 //
 
 import UIKit
+import AuthenticationServices
+import CoreData
 
 import Firebase
+import GoogleSignIn
+import Lottie
+
 
 import Feature
-import DomainAuthentication
+import FeatureAuthenticationInterface
 import SharedCommonUI
+import DomainAuthentication
+
+
+
+extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
+    func passwordRegistDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("비밀번호 등록 성공")
+            showLoginSuccessView()
+            
+        } else {
+            // 오류 처리 로직 구현
+            print("비밀번로 등록 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
+}
+
+extension SceneDelegate: PasswordRegistrationSuccessViewControllerDelegate {
+    func userRegistDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("전체 로그인 성공")
+            showMainView()
+            
+        } else {
+            // 오류 처리 로직 구현
+            print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
+}
 
 extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewControllerDelegate {
     // LaunchScreenViewControllerDelegate
     func launchScreenDidFinish() {
+        
+        //        CoreDataProvider.shared.clearCoreData()
         // 로그인 상태 확인 후 적절한 인증 절차 진행
-        if let _ = Auth.auth().currentUser {
+        let authService = AuthenticationManager()
+        if authService.isUserLoggedIn() {
             showMainView()
         } else {
-            showLoginView()
+            //            showLoginView()
+            moveToPasswordRegisteration()
         }
     }
     
-    // LoginViewControllerDelegate
-    func loginDidFinish(success: Bool, error: Error?) {
+    func oauthLoginDidFinish(success: Bool, error: Error?) {
         if success {
             // 로그인 성공 후 메인 화면 표시 로직 구현
             print("로그인 성공")
-            showMainView()
+            showPasswordRegistrationView()
         } else {
             // 오류 처리 로직 구현
             print("로그인 실패: \(String(describing: error?.localizedDescription))")
@@ -81,6 +120,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
     
+    func showPasswordRegistrationView() {
+        let passwordRegistrationViewController = PasswordRegistrationViewController()
+        passwordRegistrationViewController.delegate = self
+        window?.rootViewController = passwordRegistrationViewController
+        window?.makeKeyAndVisible()
+    }
+    
+    func showLoginSuccessView() {
+        let loginSuccessViewController = PasswordRegistrationSuccessViewController()
+        loginSuccessViewController.delegate = self // 로그인 성공 후 콜백 처리를 위해 델리게이트 설정 필요
+        window?.rootViewController = loginSuccessViewController
+        window?.makeKeyAndVisible()
+    }
+    
     private func authenticateUser() {
         biometricFlow?.start { [weak self] success, error in
             DispatchQueue.main.async {
@@ -89,10 +142,19 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     self?.coverViewManager?.removeCoverView()
                 } else {
                     // 앱 꺼짐 혹은 재시도 Flow Feature
-                    self?.biometricFlow?.showFailureViewController(error: error)
+//                    self?.biometricFlow?.showFailureViewController(error: error)
                 }
             }
         }
+    }
+    
+    func moveToPasswordRegisteration() {
+        // 비밀번호 등록 뷰 컨트롤러 생성
+        let PasswordRegistrationViewController = PasswordRegistrationViewController()
+        PasswordRegistrationViewController.delegate = self
+        // 비밀번호 등록 뷰 컨트롤러로 이동
+        window?.rootViewController = PasswordRegistrationViewController
+        window?.makeKeyAndVisible()
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
@@ -122,5 +184,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     //    func signInOAuthView(_ scene: UIScene) {
     //        oauthViewManager?.
     //    }
+    
+    
+    
 }
-
