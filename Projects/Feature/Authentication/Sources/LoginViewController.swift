@@ -16,6 +16,8 @@ import DomainAuthenticationInterface
 import CoreAuthentication
 import CoreCoreDataProvider
 import SharedCommonUI
+import SharedDesignSystem
+import Firebase
 
 
 public final class LoginViewController: UIViewController {
@@ -27,7 +29,7 @@ public final class LoginViewController: UIViewController {
     private var authService: AuthenticationService
     
     // Google 로그인 버튼
-    private var googleLoginButton: GIDSignInButton!
+    private var googleLoginButton: UIButton!
     private var AppleLoginButton: ASAuthorizationAppleIDButton!
     private var loginLabel: UILabel!
     private var portraitContraints: [NSLayoutConstraint]!
@@ -45,7 +47,7 @@ public final class LoginViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         setupLoginLabel()
         setupGoogleLoginButton()
         setupAppleLoginButton()
@@ -106,7 +108,7 @@ public final class LoginViewController: UIViewController {
             googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor, constant: 10), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
             AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
@@ -121,13 +123,14 @@ public final class LoginViewController: UIViewController {
             googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor, constant: 10), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
             AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
     }
     
     private func setupLoginLabel() {
+        loginLabel = UILabel()
         loginLabel.text = "Swifty Proteins"
         loginLabel.textAlignment = .center
         loginLabel.font = UIFontMetrics(forTextStyle: .title1)
@@ -138,17 +141,25 @@ public final class LoginViewController: UIViewController {
     }
 
     private func setupGoogleLoginButton() {
-        // Google 로그인 버튼 설정
-        googleLoginButton.colorScheme = .dark
-        googleLoginButton.style = .wide // 버튼 스타일 설정, 필요에 따라 변경 가능
+        googleLoginButton = UIButton(type: .system)
+        let googleLogoImage = SharedDesignSystem.GoogleLogo
+        googleLoginButton.setImage(googleLogoImage, for: .normal)
+        googleLoginButton.setTitle(" Sign in with Google", for: .normal)
+        googleLoginButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        googleLoginButton.tintColor = .gray
+        googleLoginButton.backgroundColor = .white
+        googleLoginButton.layer.cornerRadius = 5
+        googleLoginButton.layer.borderWidth = 0.5 // 테두리 두께 설정
+        googleLoginButton.layer.borderColor = UIColor.gray.cgColor // 테두리 색상 설정
         googleLoginButton.addTarget(self, action: #selector(startGoogleSignIn), for: .touchUpInside)
-        
         googleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(googleLoginButton)
     }
+
     
     private func setupAppleLoginButton() {
         // Apple 로그인 버튼 설정
+        AppleLoginButton = ASAuthorizationAppleIDButton()
         AppleLoginButton.addTarget(self, action: #selector(startAppleSignIn), for: .touchUpInside)
         AppleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(AppleLoginButton)

@@ -26,7 +26,7 @@ open class PasswordRegistrationViewController: UIViewController {
     // MARK: - Private Methods
     
     open func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         
         // 비밀번호 입력 필드
         passwordTextField = UITextField()
@@ -84,7 +84,8 @@ open class PasswordRegistrationViewController: UIViewController {
             for number in row {
                 let button = UIButton(type: .system)
                 if number as? String != nil {
-                    button.setImage(UIImage(systemName: "delete.left"), for: .normal)
+                    let buttonImage = UIImage(systemName: "delete.left")
+                    button.setImage(buttonImage, for: .normal)
 //                    self.setButtonProperties(_button: button, _rowStackView: rowStackView)
                     button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
                     button.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
@@ -96,7 +97,11 @@ open class PasswordRegistrationViewController: UIViewController {
                 } else {
                     self.setNumberButtonProperties(_button: button, _rowStackView: rowStackView)
                 }
-                
+                button.setTitleColor(.foregroundColor, for: .normal)
+                button.backgroundColor = .backgroundColor
+                button.layer.cornerRadius = buttonWidth / 2
+                button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+                button.tintColor = .foregroundColor
             }
 
             buttonStackView.addArrangedSubview(rowStackView)
@@ -156,10 +161,17 @@ open class PasswordRegistrationViewController: UIViewController {
                         self.delegate?.passwordRegistDidFinish(success: true, error: nil)
                         
                     } else {
-                        // PasswordRegistrationFailureView 호출
-//                        let failureView = PasswordRegistrationFailureView()
-//                            // 필요한 경우 failureView에 대한 추가 설정 가능
-//                        self.view.addSubview(failureView)
+                        // 비밀번호 등록 실패 시 PasswordRegistrationFailureView 보여주기
+                        let failureView = PasswordRegistrationFailureView(frame: self.view.bounds)
+                        self.view.addSubview(failureView)
+                        failureView.translatesAutoresizingMaskIntoConstraints = false
+                        NSLayoutConstraint.activate([
+                            failureView.topAnchor.constraint(equalTo: self.view.topAnchor),
+                            failureView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+                            failureView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                            failureView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+                        ])
+                        
                         passwordTextField.isHidden = false
                         passwordConfirmedTextField.isHidden = true
                         passwordTextField.text?.removeAll()

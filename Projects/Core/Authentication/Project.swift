@@ -24,6 +24,15 @@ let project = Project.makeModule(
                     .external(name: "FirebaseAppDistribution-Beta"),
                     .external(name: "FirebaseAnalytics"),
                     .external(name: "FirebaseAuthCombine-Community"),
+                    .external(name: "FirebaseFirestoreCombine-Community"),
+
+
+                    //.external(name: "FirebaseAnonymousAuthUI"),
+                    //.external(name: "FirebaseAuthUI"),
+                    //.external(name: "FirebaseDatebaseUI"),
+                    //.external(name: "FirebaseGoogleAuthUI"),
+                    //.external(name: "FirebasePhoneAuthUI"),
+                    //.external(name: "FirebaseOAuthUI"),
                     .external(name: "Alamofire"),
                     .external(name: "GoogleSignIn"),
                     .external(name: "GoogleSignInSwift"),

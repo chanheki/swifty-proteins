@@ -1,10 +1,23 @@
+//
+//  UnsubscribeViewController.swift
+//  FeatureAuthentication
+//
+//  Created by 민영재 on 6/11/24.
+//
+
 import UIKit
 
-public class PasswordRegistrationFailureView: UIView {
+import DomainAuthentication
+import FeatureAuthenticationInterface
+
+import SharedCommonUI
+
+public class DeleteAccountViewController: UIView {
+    
     // 이 클래스에서 사용할 UI 요소들을 정의합니다.
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "비밀번호 등록에 실패했습니다. 다시 시도해주세요."
+        label.text = "Do you want to delete account? Really..?."
         label.textColor = .black
         label.font = .systemFont(ofSize: 16, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -13,7 +26,7 @@ public class PasswordRegistrationFailureView: UIView {
     
     private let confirmButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("확인", for: .normal)
+        button.setTitle("Confirm", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .blue
         button.layer.cornerRadius = 8
@@ -64,3 +77,5 @@ public class PasswordRegistrationFailureView: UIView {
         self.removeFromSuperview()
     }
 }
+
+
