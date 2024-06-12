@@ -20,6 +20,7 @@ import SharedCommonUI
 import DomainAuthentication
 
 
+
 extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
     func passwordRegistDidFinish(success: Bool, error: Error?) {
         if success {
@@ -58,8 +59,8 @@ extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewController
         if authService.isUserLoggedIn() {
             showMainView()
         } else {
-//                        showLoginView()
-            moveToPasswordRegisteration()
+                        showLoginView()
+//            moveToPasswordRegisteration()
         }
     }
     
@@ -155,10 +156,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        window?.rootViewController = PasswordRegistrationViewController
 //        window?.makeKeyAndVisible()
         
-        let UnsubscribeViewController = DeleteAccountViewController()
-        UnsubscribeViewController.delegate = self
-        window?.rootViewController = UnsubscribeViewController
-        window?.makeKeyAndVisible()
+//        let UnsubscribeViewController = DeleteAccountViewController()
+//        UnsubscribeViewController.delegate = self
+//        window?.rootViewController = UnsubscribeViewController
+//        window?.makeKeyAndVisible()
     }
     
     func sceneWillResignActive(_ scene: UIScene) {

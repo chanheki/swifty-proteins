@@ -47,7 +47,7 @@ public final class LoginViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         setupLoginLabel()
         setupGoogleLoginButton()
         setupAppleLoginButton()
@@ -108,7 +108,7 @@ public final class LoginViewController: UIViewController {
             googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor, constant: 10), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
             AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
@@ -123,7 +123,7 @@ public final class LoginViewController: UIViewController {
             googleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             googleLoginButton.heightAnchor.constraint(equalToConstant: 48), // 버튼의 높이를 50포인트로 설정
             AppleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
+            AppleLoginButton.topAnchor.constraint(equalTo: googleLoginButton.bottomAnchor, constant: 10), // Google 로그인 버튼 아래에 20포인트 간격을 두고 위치
             AppleLoginButton.widthAnchor.constraint(equalToConstant: 250), // 버튼의 너비를 280포인트로 설정
             AppleLoginButton.heightAnchor.constraint(equalToConstant: 48) // 버튼의 높이를 50포인트로 설정
         ]
@@ -148,7 +148,7 @@ public final class LoginViewController: UIViewController {
         googleLoginButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         googleLoginButton.tintColor = .gray
         googleLoginButton.backgroundColor = .white
-        googleLoginButton.layer.cornerRadius = 8
+        googleLoginButton.layer.cornerRadius = 5
         googleLoginButton.layer.borderWidth = 0.5 // 테두리 두께 설정
         googleLoginButton.layer.borderColor = UIColor.gray.cgColor // 테두리 색상 설정
         googleLoginButton.addTarget(self, action: #selector(startGoogleSignIn), for: .touchUpInside)

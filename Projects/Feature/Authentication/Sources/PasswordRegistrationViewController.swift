@@ -26,7 +26,7 @@ open class PasswordRegistrationViewController: UIViewController {
     // MARK: - Private Methods
     
     open func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         
         // 비밀번호 입력 필드
         passwordTextField = UITextField()
@@ -84,7 +84,8 @@ open class PasswordRegistrationViewController: UIViewController {
             for number in row {
                 let button = UIButton(type: .system)
                 if number as? String != nil {
-                    button.setImage(UIImage(systemName: "delete.left"), for: .normal)
+                    let buttonImage = UIImage(systemName: "delete.left")
+                    button.setImage(buttonImage, for: .normal)
 //                    self.setButtonProperties(_button: button, _rowStackView: rowStackView)
                     button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
                     button.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
@@ -96,7 +97,11 @@ open class PasswordRegistrationViewController: UIViewController {
                 } else {
                     self.setNumberButtonProperties(_button: button, _rowStackView: rowStackView)
                 }
-                
+                button.setTitleColor(.foregroundColor, for: .normal)
+                button.backgroundColor = .backgroundColor
+                button.layer.cornerRadius = buttonWidth / 2
+                button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
+                button.tintColor = .foregroundColor
             }
 
             buttonStackView.addArrangedSubview(rowStackView)

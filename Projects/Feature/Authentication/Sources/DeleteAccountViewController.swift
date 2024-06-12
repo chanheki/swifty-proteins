@@ -12,118 +12,69 @@ import FeatureAuthenticationInterface
 
 import SharedCommonUI
 
-public class DeleteAccountViewController: UIViewController {
+public class DeleteAccountViewController: UIView {
     
-    public weak var delegate: PasswordRegistrationViewControllerDelegate?
-    
-    private let containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .backgroundColor
-        view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor.gray.cgColor
-        view.layer.cornerRadius = 8
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Delete Account"
-        label.font = .systemFont(ofSize: 24, weight: .bold)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
+    // 이 클래스에서 사용할 UI 요소들을 정의합니다.
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "Do you want to Delete Account?"
-        label.font = .systemFont(ofSize: 18, weight: .regular)
+        label.text = "Do you want to delete account? Really..?."
+        label.textColor = .black
+        label.font = .systemFont(ofSize: 16, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 20
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    private lazy var yesButton: UIButton = {
+    private let confirmButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("comfirm", for: .normal)
-        button.setTitleColor(.systemRed, for: .normal)
-        button.addTarget(self, action: #selector(yesButtonTapped), for: .touchUpInside)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.gray.cgColor
+        button.setTitle("Confirm", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .blue
+        button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private lazy var noButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("cancel", for: .normal)
-        button.setTitleColor(.foregroundColor, for: .normal)
-        button.addTarget(self, action: #selector(noButtonTapped), for: .touchUpInside)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.gray.cgColor
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
+    // 초기화 메서드
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
     }
     
-    private func setupUI() {
-        view.backgroundColor = .backgroundColor
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+    
+    private func setupView() {
+        backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.8)
         
-        view.addSubview(containerView)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(messageLabel)
-        containerView.addSubview(buttonStackView)
+        addSubview(messageLabel)
+        addSubview(confirmButton)
         
-        buttonStackView.addArrangedSubview(yesButton)
-        buttonStackView.addArrangedSubview(noButton)
-        
+        // messageLabel의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
-            titleLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 30),
-            
-            messageLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
-            
-            buttonStackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            buttonStackView.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 30),
-            
-            yesButton.widthAnchor.constraint(equalToConstant: 80),
-            noButton.widthAnchor.constraint(equalToConstant: 80),
-            
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalToConstant: view.frame.width * 0.8),
-            containerView.heightAnchor.constraint(equalToConstant: view.frame.height * 0.2),
-            
+            messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
         ])
+        
+        // confirmButton의 레이아웃 제약조건 설정
+        NSLayoutConstraint.activate([
+            confirmButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            confirmButton.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 30),
+            confirmButton.widthAnchor.constraint(equalToConstant: 100),
+            confirmButton.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        // 확인 버튼 클릭 이벤트 추가
+        confirmButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+        
+        // 화면 밖 터치 시 뷰 사라지게 하는 제스처 추가
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissView))
+        addGestureRecognizer(tapGesture)
     }
     
-    @objc private func yesButtonTapped() {
-        // 회원 탈퇴 API 호출
-        // 성공 시 아래 코드 실행
-        presentUnsubscribeSuccessView()
-    }
-    
-    @objc private func noButtonTapped() {
-        // 아니오 버튼 클릭 시 처리
-        navigationController?.popViewController(animated: true)
-    }
-    
-    private func presentUnsubscribeSuccessView() {
-        let authService = AuthenticationManager()
-        let loginViewController = LoginViewController(authService: authService)
-        navigationController?.pushViewController(loginViewController, animated: true)
+    @objc private func dismissView() {
+        self.removeFromSuperview()
     }
 }
 
