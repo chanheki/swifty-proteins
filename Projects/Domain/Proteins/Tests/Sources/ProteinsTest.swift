@@ -91,7 +91,7 @@ final class LigandViewModelTests: XCTestCase {
         // 실제 네트워크 요청을 사용하지 않고 Mock 데이터를 사용
         let mockData = mockPDBDataProvider.getPDBData(name: .pdbMock001).data(using: .utf8)!
         print("Mock Data: \(mockData)")
-        self.viewModel.createProteinScene(from: mockData)
+        self.viewModel.createBallStickProteinsScene(from: mockData)
         
         wait(for: [expectation], timeout: 1.0)
         

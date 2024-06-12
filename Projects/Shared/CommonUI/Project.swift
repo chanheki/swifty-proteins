@@ -7,13 +7,7 @@ let project = Project.makeModule(
     targets: [    
         .shared(
             interface: .CommonUI,
-            factory: .init(
-                dependencies: [
-                    .shared(interface: .Model),
-                    .shared(interface: .Extensions),
-                    .shared(implements: .DesignSystem),
-                ]
-            )
+            factory: .init()
         ),
         .shared(
             implements: .CommonUI,
@@ -23,7 +17,6 @@ let project = Project.makeModule(
                 ]
             )
         ),
-    
         .shared(
             testing: .CommonUI,
             factory: .init(

@@ -143,6 +143,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 } else {
                     // 앱 꺼짐 혹은 재시도 Flow Feature
 //                    self?.biometricFlow?.showFailureViewController(error: error)
+                    print("bio 실패")
                 }
             }
         }
@@ -180,11 +181,4 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.authenticateUser()
         }
     }
-    
-    //    func signInOAuthView(_ scene: UIScene) {
-    //        oauthViewManager?.
-    //    }
-    
-    
-    
 }
