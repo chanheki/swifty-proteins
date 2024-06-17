@@ -10,5 +10,5 @@ public enum SettingsType {
     case resetPassword
     case biometric
     case logout
-    case unsubscribe
+    case deleteAccount
 }
