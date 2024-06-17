@@ -159,7 +159,6 @@ extension ProteinsListViewController: ProteinsListTableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    // 스크롤 뷰 델리게이트 메서드
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let largeTitleHeight = self.navigationController?.navigationBar.frame.height ?? 0.1
@@ -184,7 +183,7 @@ extension ProteinsListViewController: PasswordVerifyViewControllerDelegate {
         if success {
             let settingViewController = SettingsViewController()
             navigationController?.pushViewController(settingViewController, animated: true)
-            AppStateManager.shared.isPossibleCoverView = true
         }
+        AppStateManager.shared.isPossibleCoverView = true
     }
 }
