@@ -9,6 +9,7 @@ import UIKit
 import CoreData
 
 import CoreAuthentication
+import SharedCommonUI
 
 public class UserInfoViewController: UIViewController {
     
@@ -24,29 +25,23 @@ public class UserInfoViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set up UI elements
         setupUI()
-        
-        // Fetch user information from Firestore
         fetchUserInfo()
     }
     
     // MARK: - Private Methods
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         
-        // Add labels to the view
         view.addSubview(nameLabel)
         view.addSubview(emailLabel)
         view.addSubview(ageLabel)
         
-        // Configure constraints for the labels
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         emailLabel.translatesAutoresizingMaskIntoConstraints = false
         ageLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add constraints for the labels
         NSLayoutConstraint.activate([
             nameLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -58,12 +53,21 @@ public class UserInfoViewController: UIViewController {
     }
     
     private func fetchUserInfo() {
-        // Fetch the current user's document from Firestore
-        if let currentUser = GoogleOAuthManager.shared.firebaseFetch() {
-            self.userInfo = currentUser
-            updateUI()
-        } else {
-            print("Failed to fetch user info")
+        GoogleOAuthManager.shared.firebaseFetch { [weak self] userInfo, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Failed to fetch user info: \(error.localizedDescription)")
+                // 추가적으로 에러를 처리할 수 있는 코드 작성 가능
+                return
+            }
+            
+            if let userInfo = userInfo {
+                self.userInfo = userInfo
+                self.updateUI()
+            } else {
+                print("Failed to fetch user info: No data found")
+            }
         }
     }
     
