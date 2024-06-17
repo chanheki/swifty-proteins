@@ -149,7 +149,7 @@ public final class LoginViewController: UIViewController {
                     return
                 }
                 
-                self?.delegate?.oauthLoginDidFinish(success: true, error: nil)
+                self?.delegate?.oauthLoginDidFinish(success: success, error: nil)
             }
         }
     }
