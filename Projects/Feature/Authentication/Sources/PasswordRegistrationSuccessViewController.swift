@@ -2,6 +2,8 @@ import UIKit
 import CoreData
 import AuthenticationServices
 
+import Lottie
+
 import FeatureAuthenticationInterface
 import CoreAuthentication
 import CoreCoreDataProvider
@@ -32,6 +34,8 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
         return label
     }()
     
+    let lottieAnimationView = CheckBoxAnimationView
+    
     private let doneButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("확인", for: .normal)
@@ -39,16 +43,16 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
-        button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         return button
     }()
+    
     
     // MARK: - Lifecycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        setupProperty()
         setupUI()
-        
         
         // 10초 후에 자동으로 사라지게 함
         DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
@@ -61,33 +65,19 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let lottieAnimationView = CheckBoxAnimationView;
-        
-        // Lottie 애니메이션 뷰를 기존 뷰 위에 올려놓기
-        view.addSubview(lottieAnimationView)
-        lottieAnimationView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            lottieAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            lottieAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            lottieAnimationView.widthAnchor.constraint(equalToConstant: 300),
-            lottieAnimationView.heightAnchor.constraint(equalToConstant: 300)
-
-        ])
-        
-        // 로그인 완료 알림을 위한 UI 애니메이션 적용
         showLoginCompletionUIAnimation()
     }
     
     private func showLoginCompletionUIAnimation() {
-        // 로그인 완료 후 UI 업데이트 (예: 타이틀 라벨, 메시지 라벨, 완료 버튼 등의 애니메이션 효과 적용)
+        lottieAnimationView.center = view.center
+        lottieAnimationView.play()
+        
         titleLabel.alpha = 0
         titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         messageLabel.alpha = 0
         messageLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         doneButton.alpha = 0
         doneButton.transform = CGAffineTransform(translationX: 0, y: view.bounds.height)
-        
-        
         
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.3, options: [.curveEaseInOut]) {
             self.titleLabel.alpha = 1
@@ -98,7 +88,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
             self.doneButton.transform = .identity
         }
     }
-
+    
     private func handleLoginCompletionAnimation() {
         // 로그인 완료 후 UI 업데이트 (예: 타이틀 라벨, 메시지 라벨, 완료 버튼 등의 애니메이션 효과 적용)
         titleLabel.transform = CGAffineTransform(translationX: -view.bounds.width, y: 0)
@@ -111,8 +101,10 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
             self.doneButton.transform = .identity
         }
     }
-
     
+    private func setupProperty() {
+        doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
+    }
     
     // MARK: - UI Setup
     
@@ -121,10 +113,12 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
         
         view.addSubview(titleLabel)
         view.addSubview(messageLabel)
+        view.addSubview(lottieAnimationView)
         view.addSubview(doneButton)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
+        lottieAnimationView.translatesAutoresizingMaskIntoConstraints = false
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -135,6 +129,11 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
             messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
             messageLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             messageLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            lottieAnimationView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            lottieAnimationView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            lottieAnimationView.widthAnchor.constraint(equalToConstant: 300),
+            lottieAnimationView.heightAnchor.constraint(equalToConstant: 300),
             
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
             doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
