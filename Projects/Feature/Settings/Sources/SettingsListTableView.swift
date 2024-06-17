@@ -9,9 +9,9 @@ import UIKit
 
 import FeatureSettingsInterface
 import DomainSettings
+import CoreCoreDataProvider
 import SharedExtensions
 
-// SettingsListTableView가 TableView의 모든것을 담당 (ex. DataSource, Delegate)
 public final class SettingsListTableView: UITableView {
     
     private var viewModel: SettingsViewModel
@@ -47,7 +47,6 @@ public final class SettingsListTableView: UITableView {
         separatorStyle = .singleLine
         backgroundColor = .backgroundColor
         
-        // 섹션 헤더
         sectionHeaderTopPadding = 0
     }
     
@@ -61,7 +60,6 @@ public final class SettingsListTableView: UITableView {
         viewModel.toggleBiometric(sender.isOn)
     }
 }
-
 
 extension SettingsListTableView: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -92,7 +90,7 @@ extension SettingsListTableView: UITableViewDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: "biometricCell", for: indexPath) as! BiometricTableViewCell
             cell.textLabel?.text = "Biometric Authentication"
             cell.textLabel?.textColor = .label
-            cell.switchControl.isOn = false
+            cell.switchControl.isOn = AppStateManager.shared.isBiometricEnabled
             cell.switchControl.addTarget(self, action: #selector(biometricSwitchChanged(_:)), for: .valueChanged)
             return cell
             
@@ -103,9 +101,9 @@ extension SettingsListTableView: UITableViewDelegate {
             cell.accessoryType = .none
             return cell
             
-        case .unsubscribe:
+        case .deleteAccount:
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = "Unsubscribe"
+            cell.textLabel?.text = "Delete Account"
             cell.textLabel?.textColor = .red
             cell.accessoryType = .none
             return cell
