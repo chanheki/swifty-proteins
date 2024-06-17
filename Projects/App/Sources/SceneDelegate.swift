@@ -31,7 +31,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func showMainView() {
-        // protein list view
         let initialViewController = ProteinsListViewController()
         
         window?.rootViewController = initialViewController.initialView()
@@ -95,7 +94,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        if coverViewManager?.hasCoverView() == true {
+        if coverViewManager?.hasCoverView() == true && !AppStateManager.shared.isBegin {
             self.authenticateUser()
         }
     }
@@ -109,6 +108,7 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
         if success {
             if AppStateManager.shared.isBegin {
                 AppStateManager.shared.isBegin.toggle()
+                print("첫 시작 검증 끝나고 showMainView()")
                 showMainView()
             } else {
                 self.coverViewManager?.removeCoverView()
@@ -119,18 +119,22 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
     // PasswordRegistrationViewControllerDelegate
     func passwordRegistDidFinish(success: Bool, error: Error?) {
         if success {
+            print("비밀번호 등록 성공")
             showLoginSuccessView()
         } else {
             print("비밀번로 등록 실패: \(String(describing: error?.localizedDescription))")
+            showLoginView()
         }
     }
     
     // PasswordRegistrationSuccessViewControllerDelegate
     func userRegistDidFinish(success: Bool, error: Error?) {
         if success {
+            print("전체 로그인 성공")
             showMainView()
         } else {
             print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
+            showLoginView()
         }
     }
     
@@ -152,9 +156,11 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
     // LoginViewControllerDelegate
     func oauthLoginDidFinish(success: Bool, error: Error?) {
         if success {
+            print("로그인 성공: \(String(describing: error?.localizedDescription))")
             showPasswordRegistrationView()
         } else {
             print("로그인 실패: \(String(describing: error?.localizedDescription))")
+            showLoginView()
         }
     }
 }
