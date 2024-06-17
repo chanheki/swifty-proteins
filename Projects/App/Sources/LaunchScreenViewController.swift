@@ -30,7 +30,6 @@ final class LaunchScreenViewController: UIViewController {
                 self?.customLaunchScreenView.alpha = 1
             }, completion: { _ in
                 self?.delegate?.launchScreenDidFinish()
-                self?.customLaunchScreenView.removeFromSuperview()
             })
         }
     }
