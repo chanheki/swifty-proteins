@@ -15,15 +15,12 @@ public final class AuthenticationManager: AuthenticationService {
     
     public init() {}
     
-    public func saveTokensToCoreData(_ email: String, _ accessToken: String, _ refreshToken: String) {
-        _ = CoreDataProvider.shared.createUserEntity(accessToken: accessToken, refreshToken: refreshToken)
+    public func isUserLoggedIn() -> Bool {
+        return CoreDataProvider.shared.fetchUserID() != nil
     }
     
-    public func isUserLoggedIn() -> Bool {
-        if let userEntities = CoreDataProvider.shared.fetchUserEntity() {
-            return true
-        }
-        return false
+    public func isSettingUserPassword() -> Bool {
+        return CoreDataProvider.shared.fetchUserPassword() != nil
     }
     
     public func clearCoreData() {
@@ -32,5 +29,14 @@ public final class AuthenticationManager: AuthenticationService {
     
     public func appleSignIn(presentingViewController: UIViewController, completion: @escaping (Bool, Error?) -> Void) {
         AppleOAuthManager.shared.startSignInWithAppleFlow(presentingViewController: presentingViewController, completion: completion)
+    }
+    
+    public var isBiometricEnabled: Bool {
+        get {
+            return AppStateManager.shared.isBiometricEnabled
+        }
+        set {
+            AppStateManager.shared.isBiometricEnabled = newValue
+        }
     }
 }
