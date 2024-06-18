@@ -122,17 +122,22 @@ public final class CoreDataProvider: CoreDataProviderInterface {
     
     public func clearCoreData() {
         let context = persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "UserEntity")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            try context.execute(deleteRequest)
+            let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+            let userEntities = try context.fetch(fetchRequest)
+            
+            for userEntity in userEntities {
+                context.delete(userEntity)
+            }
+            
             try context.save()
             print("CoreData successfully cleared")
         } catch {
             print("Error clearing CoreData: \(error)")
         }
     }
+
     
     public func createUser(id: String, name: String) -> Bool {
         let context = persistentContainer.viewContext

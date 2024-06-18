@@ -23,6 +23,10 @@ public final class AuthenticationManager: AuthenticationService {
         return CoreDataProvider.shared.fetchUserPassword() != nil
     }
     
+    public func clearCoreData() {
+        CoreDataProvider.shared.clearCoreData()
+    }
+    
     public func appleSignIn(presentingViewController: UIViewController, completion: @escaping (Bool, Error?) -> Void) {
         AppleOAuthManager.shared.startSignInWithAppleFlow(presentingViewController: presentingViewController, completion: completion)
     }
