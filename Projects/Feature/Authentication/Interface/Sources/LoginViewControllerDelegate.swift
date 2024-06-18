@@ -17,3 +17,7 @@ public protocol PasswordRegistrationViewControllerDelegate: AnyObject {
 public protocol PasswordRegistrationSuccessViewControllerDelegate: AnyObject {
     func userRegistDidFinish(success: Bool, error: Error?)
 }
+
+public protocol PasswordVerifyViewControllerDelegate: AnyObject {
+    func passwordVerificationDidFinish(success: Bool)
+}
