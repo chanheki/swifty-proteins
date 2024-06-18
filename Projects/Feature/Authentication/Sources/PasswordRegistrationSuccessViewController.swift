@@ -8,11 +8,11 @@ import CoreCoreDataProvider
 import SharedCommonUI
 import SharedDesignSystem
 
-public class PasswordRegistrationSuccessViewController: UIViewController {
+open class PasswordRegistrationSuccessViewController: UIViewController {
     
     // MARK: - Properties
     public weak var delegate: PasswordRegistrationSuccessViewControllerDelegate?
-    private var isAutoCloseEnabled = true
+    open var isAutoCloseEnabled = true
     
     // UI 요소들 선언
     private let titleLabel: UILabel = {
@@ -145,7 +145,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
     
     // MARK: - Actions
     
-    @objc private func doneButtonTapped() {
+    @objc public func doneButtonTapped() {
         // 확인 버튼 클릭 시 처리할 로직
         isAutoCloseEnabled = false
         delegate?.userRegistDidFinish(success: true, error: nil)

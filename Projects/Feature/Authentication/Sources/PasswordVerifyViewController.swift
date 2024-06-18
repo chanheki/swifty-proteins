@@ -7,14 +7,14 @@ import CoreAuthentication
 import CoreCoreDataProvider
 import SharedCommonUI
 
-class PasswordVerifyViewController: PasswordRegistrationViewController {
+public class PasswordVerifyViewController: PasswordRegistrationViewController {
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
     
-    override func appendToPasswordField(_ digit: String) {
+    public override func appendToPasswordField(_ digit: String) {
         if passwordTextField.text?.count ?? 0 < 4 {
             passwordTextField.text?.append(digit)
             if passwordTextField.text?.count == 4 {
