@@ -38,7 +38,7 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
                 .$settings
                 .receive(on: RunLoop.main)
                 .sink { [weak self] _ in
-                    guard let self = self else { return }
+                    guard self != nil else { return }
                     settingsView.settingListTableView.reloadData()
                 }
                 .store(in: &cancellables)
@@ -109,7 +109,6 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
 }
 
 extension SettingsViewController: PasswordRegistrationViewControllerDelegate, PasswordRegistrationSuccessViewControllerDelegate {
-    
     // PasswordRegistrationViewControllerDelegate
     public func passwordRegistDidFinish(success: Bool, error: Error?) {
         if success {

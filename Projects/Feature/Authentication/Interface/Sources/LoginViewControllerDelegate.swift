@@ -12,12 +12,10 @@ public protocol LoginViewControllerDelegate: AnyObject {
 
 public protocol PasswordRegistrationViewControllerDelegate: AnyObject {
     func passwordRegistDidFinish(success: Bool, error: Error?)
-    func passwordResetDidFinish(success: Bool, error: Error?)
 }
 
 public protocol PasswordRegistrationSuccessViewControllerDelegate: AnyObject {
     func userRegistDidFinish(success: Bool, error: Error?)
-    func userPasswordResetDidFinish(success: Bool, error: Error?)
 }
 
 public protocol PasswordVerifyViewControllerDelegate: AnyObject {
