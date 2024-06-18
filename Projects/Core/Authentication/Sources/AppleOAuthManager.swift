@@ -82,7 +82,7 @@ extension AppleOAuthManager: ASAuthorizationControllerDelegate {
                     return
                 }
                 
-                guard let user = authResult?.user else {
+                guard (authResult?.user) != nil else {
                     self.completion?(false, NSError(domain: "AppleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase authentication failed"]))
                     return
                 }

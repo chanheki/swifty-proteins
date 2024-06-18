@@ -37,9 +37,9 @@ public class PasswordResetViewController: PasswordRegistrationViewController {
                     // 비밀번호 검증 로직
                     if passwordTextField.text == passwordConfirmedTextField.text {
                         //CoreData 저장 및 MainView 이동
-                        CoreDataProvider.shared.saveTokensToCoreData(password: passwordTextField.text!)
+                        CoreDataProvider.shared.updatePasswordForCurrentUser(password: passwordTextField.text!)
                         self.delegate?
-                            .passwordResetDidFinish(success: true, error: nil)
+                            .passwordRegistDidFinish(success: true, error: nil)
                         
                     } else {
                         // 비밀번호 등록 실패 시 PasswordRegistrationFailureView 보여주기
