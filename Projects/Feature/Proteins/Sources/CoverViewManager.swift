@@ -7,10 +7,8 @@
 
 import UIKit
 
-import Lottie
-
+import CoreCoreDataProvider
 import SharedDesignSystem
-
 
 public final class CoverViewManager {
     private var window: UIWindow?
@@ -21,6 +19,12 @@ public final class CoverViewManager {
     }
     
     public func addCoverView() {
+        if AppStateManager.shared.isPossibleCoverView {
+            startCoverView()
+        }
+    }
+    
+    public func startCoverView() {
         if let window = window, coverView == nil {
             let coverView = CoverView(frame: window.bounds)
             window.addSubview(coverView)
@@ -38,7 +42,6 @@ public final class CoverViewManager {
             self.coverView = nil
         })
     }
-    
     
     public func hasCoverView() -> Bool {
         return coverView != nil

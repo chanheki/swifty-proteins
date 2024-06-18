@@ -9,7 +9,7 @@ import CoreData
 
 import CoreCoreDataProviderInterface
 
-public final class CoreDataProvider {
+public final class CoreDataProvider: CoreDataProviderInterface {
     
     public static let shared = CoreDataProvider()
     public init() {}
@@ -38,8 +38,22 @@ public final class CoreDataProvider {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         }
+
         return container
     }()
+    
+    public func fetchAllUsers() -> [UserEntity] {
+        let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+
+        do {
+            let users = try context.fetch(fetchRequest)
+            return users
+        } catch {
+            print("Failed to fetch users: \(error)")
+            return []
+        }
+    }
     
     public func saveContext() {
         let context = persistentContainer.viewContext
@@ -53,58 +67,42 @@ public final class CoreDataProvider {
         }
     }
     
-    public func fetchUserEntity() -> [UserEntity]? {
+    public func fetchUserID() -> String? {
         let context = persistentContainer.viewContext
         let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         
         do {
             let userEntities = try context.fetch(fetchRequest)
-            return userEntities
+            return userEntities.first?.id
         } catch {
             print("Error fetching user entity: \(error)")
             return nil
         }
     }
     
-    public func createUserEntity(accessToken: String, refreshToken: String) -> Bool {
+    public func fetchUserName() -> String? {
         let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         
-        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
-            //            userEntity.accessToken = accessToken
-            //            userEntity.refreshToken = refreshToken
-            
-            do {
-                try context.save()
-                print("AccessToken and RefreshToken saved to CoreData")
-                return true
-            } catch {
-                print("Error saving Tokens to CoreData: \(error.localizedDescription)")
-                return false
-            }
-        } else {
-            print("Failed to create UserEntity object")
-            return false
+        do {
+            let userEntities = try context.fetch(fetchRequest)
+            return userEntities.first?.name
+        } catch {
+            print("Error fetching user entity: \(error)")
+            return nil
         }
     }
     
-    public func saveTokensToCoreData(password: String) -> Bool {
+    public func fetchUserPassword() -> String? {
         let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         
-        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
-            userEntity.password = password
-            
-            
-            do {
-                try context.save()
-                print("Password saved to CoreData")
-                return true
-            } catch {
-                print("Error saving Tokens to CoreData: \(error.localizedDescription)")
-                return false
-            }
-        } else {
-            print("Failed to create UserEntity object")
-            return false
+        do {
+            let userEntities = try context.fetch(fetchRequest)
+            return userEntities.first?.password
+        } catch {
+            print("Error fetching user entity: \(error)")
+            return nil
         }
     }
     
@@ -115,8 +113,6 @@ public final class CoreDataProvider {
         
         do {
             let userEntities = try userContext.fetch(fetchRequest)
-            
-            // 사용자 엔티티가 존재하고, 입력한 password와 UserEntity의 password가 일치하면 true 반환
             return !userEntities.isEmpty && userEntities.first?.password == password
         } catch {
             print("Error fetching user token: \(error)")
@@ -143,4 +139,56 @@ public final class CoreDataProvider {
     }
 
     
+    public func createUser(id: String, name: String) -> Bool {
+        let context = persistentContainer.viewContext
+        
+        if let userEntity = NSEntityDescription.insertNewObject(forEntityName: "UserEntity", into: context) as? UserEntity {
+            userEntity.id = id
+            userEntity.name = name
+            
+            do {
+                try context.save()
+
+                if let url = persistentContainer.persistentStoreCoordinator.persistentStores.first?.url {
+                    print("Database Path: \(url.path)")
+                }
+
+                print("New user created and saved.")
+                return true
+            } catch {
+                print("Failed to create new user: \(error)")
+                return false
+            }
+        } else {
+            print("Failed to create UserEntity object")
+            return false
+        }
+    }
+    
+    public func updatePasswordForCurrentUser(password: String) -> Bool {
+        guard let userId = AppStateManager.shared.userID else {
+            print("No user ID available.")
+            return false
+        }
+
+        let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", userId)
+
+        do {
+            if let userEntity = try context.fetch(fetchRequest).first {
+                userEntity.password = password
+                try context.save()
+                print("Password updated and saved to CoreData for user ID: \(userId)")
+                return true
+            } else {
+                print("No user found with ID \(userId) to update password.")
+                return false
+            }
+        } catch {
+            print("Error fetching user or saving password: \(error.localizedDescription)")
+            return false
+        }
+    }
+
 }
