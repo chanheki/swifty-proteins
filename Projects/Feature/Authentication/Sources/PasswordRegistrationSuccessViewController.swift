@@ -10,11 +10,11 @@ import CoreCoreDataProvider
 import SharedCommonUI
 import SharedDesignSystem
 
-public class PasswordRegistrationSuccessViewController: UIViewController {
+open class PasswordRegistrationSuccessViewController: UIViewController {
     
     // MARK: - Properties
     public weak var delegate: PasswordRegistrationSuccessViewControllerDelegate?
-    private var isAutoCloseEnabled = true
+    open var isAutoCloseEnabled = true
     
     // UI 요소들 선언
     private let titleLabel: UILabel = {
@@ -28,6 +28,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.text = "축하합니다! 비밀번호 등록이 완료되었습니다.\n 10초 뒤에 자동으로 홈 화면으로 이동됩니다."
+        label.textColor = .foregroundColor
         label.font = .systemFont(ofSize: 16)
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -40,7 +41,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("확인", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.backgroundColor, for: .normal)
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 8
         return button
@@ -109,7 +110,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
     // MARK: - UI Setup
     
     func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .backgroundColor
         
         view.addSubview(titleLabel)
         view.addSubview(messageLabel)
@@ -144,7 +145,7 @@ public class PasswordRegistrationSuccessViewController: UIViewController {
     
     // MARK: - Actions
     
-    @objc private func doneButtonTapped() {
+    @objc public func doneButtonTapped() {
         // 확인 버튼 클릭 시 처리할 로직
         isAutoCloseEnabled = false
         delegate?.userRegistDidFinish(success: true, error: nil)

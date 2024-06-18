@@ -42,7 +42,7 @@ public final class GoogleOAuthManager {
         let config = GIDConfiguration(clientID: clientID)
         
         GIDSignIn.sharedInstance.signIn(with: config, presenting: viewController) { [weak self] user, error in
-            guard let self = self else { return }
+            guard self != nil else { return }
             if let error = error {
                 completion(false, error)
                 return

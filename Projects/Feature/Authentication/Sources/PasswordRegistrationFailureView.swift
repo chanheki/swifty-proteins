@@ -33,7 +33,7 @@ public class PasswordRegistrationFailureView: UIView {
     }
     
     private func setupView() {
-        backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.8)
+        backgroundColor = .backgroundColor
         
         addSubview(messageLabel)
         addSubview(confirmButton)

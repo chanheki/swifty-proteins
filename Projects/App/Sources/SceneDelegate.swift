@@ -60,6 +60,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
     
+    func showSettingsView(){
+        let settingViewController = SettingsViewController()
+        window?.rootViewController = settingViewController
+        window?.makeKeyAndVisible()
+    }
+    
     private func authenticateUser() {
         authenticationFlow?.authenticateUser { [weak self] success, error in
             if success {
