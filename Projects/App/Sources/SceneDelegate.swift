@@ -33,6 +33,18 @@ extension SceneDelegate: PasswordRegistrationViewControllerDelegate {
             print("비밀번로 등록 실패: \(String(describing: error?.localizedDescription))")
         }
     }
+    
+    func passwordResetDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("비밀번호 리셋 성공")
+            showLoginSuccessView()
+            
+        } else {
+            // 오류 처리 로직 구현
+            print("비밀번로 리셋 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
 }
 
 extension SceneDelegate: PasswordRegistrationSuccessViewControllerDelegate {
@@ -47,15 +59,31 @@ extension SceneDelegate: PasswordRegistrationSuccessViewControllerDelegate {
             print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
         }
     }
+    
+    func userPasswordResetDidFinish(success: Bool, error: Error?) {
+        if success {
+            // 로그인 성공 후 메인 화면 표시 로직 구현
+            print("비밀번호 리셋 성공")
+            showMainView()
+            showSettingsView()
+            
+        } else {
+            // 오류 처리 로직 구현
+            print("비밀번호 리셋 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
 }
 
 extension SceneDelegate: LaunchScreenViewControllerDelegate, LoginViewControllerDelegate {
     // LaunchScreenViewControllerDelegate
     func launchScreenDidFinish() {
         
-        //        CoreDataProvider.shared.clearCoreData()
+        
+//        CoreDataProvider.shared.clearCoreData()
+//        CoreDataProvider.clearCoreData()
         // 로그인 상태 확인 후 적절한 인증 절차 진행
         let authService = AuthenticationManager()
+        authService.clearCoreData()
         if authService.isUserLoggedIn() {
             showMainView()
         } else {
@@ -131,6 +159,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let loginSuccessViewController = PasswordRegistrationSuccessViewController()
         loginSuccessViewController.delegate = self // 로그인 성공 후 콜백 처리를 위해 델리게이트 설정 필요
         window?.rootViewController = loginSuccessViewController
+        window?.makeKeyAndVisible()
+    }
+    
+    func showSettingsView(){
+        let settingViewController = SettingsViewController()
+        window?.rootViewController = settingViewController
         window?.makeKeyAndVisible()
     }
     
