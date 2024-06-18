@@ -12,7 +12,6 @@ import Lottie
 import SharedExtensions
 
 public let CheckBoxAnimationView: LottieAnimationView = {
-    // 'login_success' 애니메이션 파일 불러오기
     guard let animationView = LottieAnimation.named("checkbox") else {
         fatalError("Failed to load Lottie animation: checkbox")
     }
