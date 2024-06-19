@@ -28,7 +28,7 @@ public class LigandInfoViewController: UIViewController {
     
     private lazy var colorTableView: LigandInfoColorTableView = {
         let tableView = LigandInfoColorTableView(viewModel: viewModel)
-        tableView.setColorTableViewDelegate(self)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
@@ -59,7 +59,7 @@ public class LigandInfoViewController: UIViewController {
     }
     
     private func setupProperty() {
-        view.backgroundColor = .foregroundColor.withAlphaComponent(0.5)
+        view.backgroundColor = .clear
     }
     
     private func setupView() {
@@ -91,6 +91,8 @@ public class LigandInfoViewController: UIViewController {
                 guard let self = self else { return }
                 if let data = data {
                     self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "") Data loaded: \(data.count) bytes"
+                    self.colorTableView.reloadData()
+                    self.colorTableView.backgroundColor = .clear
                 }
             }
             .store(in: &cancellables)
@@ -112,12 +114,6 @@ public class LigandInfoViewController: UIViewController {
 extension LigandInfoViewController: CustomColorPickerDelegate {
     public func customColorPicker(_ picker: CustomColorPickerViewControllerProtocol, didSelectColor color: UIColor, for element: String) {
         viewModel.updateBackgroundColor(color)
-    }
-}
-
-extension LigandInfoViewController: ColorTableViewDelegate {
-    public func colorCell(_ cell: ColorCellProtocol, didUpdateColor color: UIColor, for element: String) {
-        viewModel.updateColor(color, for: element)
     }
 }
 
