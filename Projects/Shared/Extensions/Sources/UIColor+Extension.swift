@@ -36,6 +36,7 @@ public extension UIColor {
     static let folderGray = color(light: .systemGray3, dark: .systemGray2)
     static let webIconColor = color(light: .black, dark: .systemGray)
     static let dimmedViewColor = UIColor.black.withAlphaComponent(0.75)
+    static let dark = UIColor(hex: 0x242424)
     static let backgroundColor = color(light: .white, dark: UIColor(hex: 0x242424))
     static let foregroundColor = color(light: UIColor(hex: 0x242424), dark: .white)
     
