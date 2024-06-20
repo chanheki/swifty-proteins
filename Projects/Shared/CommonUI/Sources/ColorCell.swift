@@ -28,21 +28,44 @@ public class ColorCell: UITableViewCell, ColorCellProtocol {
         return label
     }()
     
-    private let changeColorButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Change Color", for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    private let countLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
+    
+//    private let changeColorButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setTitle("Change Color", for: .normal)
+//        button.tintColor = .foregroundColor
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//        return button
+//    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
+        setupProperty()
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupProperty() {
+        self.backgroundColor = .clear
+        self.contentView.backgroundColor = .clear
+        //        changeColorButton.addTarget(self, action: #selector(didUpdateColor), for: .touchUpInside)
+    }
+    
+    private func setupView() {
         contentView.addSubview(colorView)
         contentView.addSubview(elementLabel)
-        contentView.addSubview(changeColorButton)
-        
-        changeColorButton.addTarget(self, action: #selector(changeColor), for: .touchUpInside)
+        contentView.addSubview(countLabel)
+
+//        contentView.addSubview(changeColorButton)
+//
         
         NSLayoutConstraint.activate([
             colorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
@@ -53,26 +76,24 @@ public class ColorCell: UITableViewCell, ColorCellProtocol {
             elementLabel.leadingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: 10),
             elementLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            changeColorButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            changeColorButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            countLabel.leadingAnchor.constraint(equalTo: elementLabel.trailingAnchor, constant: 10),
+            countLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+//            changeColorButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+//            changeColorButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public func configure(with element: String, color: UIColor) {
+    public func configure(with element: String, color: UIColor, count: Int) {
         self.element = element
         elementLabel.text = element
+        countLabel.text = "\(count)"
         colorView.backgroundColor = color
+        self.backgroundColor = .clear
+        self.contentView.backgroundColor = .clear
     }
     
-    @objc private func changeColor() {
+    @objc func didUpdateColor(_ color: UIColor) {
         guard let element = element else { return }
-        // TODO: customcolorpicker 맞게 구현
-        let colorPicker = CustomColorPickerViewController()
-        colorPicker.element = element
-        
+        delegate?.colorCell(self, didUpdateColor: color, for: element)
     }
 }

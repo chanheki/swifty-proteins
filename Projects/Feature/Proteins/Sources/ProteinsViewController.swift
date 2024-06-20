@@ -42,13 +42,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         
         bindViewModel()
         fetchData(ligandName: self.ligand?.identifier ?? "")
-        
-        let proteinsView = self.contentView as! ProteinsView
-        // Setup your SCNView for Test
-        proteinsView.sceneView.accessibilityIdentifier = "sceneView"
-        print("Scene view accessibility identifier set")
-        
-        segmentedControl.addTarget(self, action: #selector(segmentedControlChanged), for: .valueChanged)
     }
     
     private func bindViewModel() {
@@ -72,6 +65,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     
     func setupNavigationBar() {
         self.setNavigationBarHidden(true)
+        self.navigationItem.largeTitleDisplayMode = .never
         self.navigationItem.titleView = segmentedControl
         setupNavigationRightButton()
     }
@@ -79,18 +73,20 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     public override func setupProperty() {
         view.backgroundColor = .backgroundColor
         self.activityIndicator.startAnimating()
+        
+        self.segmentedControl.addTarget(self, action: #selector(self.segmentedControlChanged), for: .valueChanged)
     }
     
     private func setupView() {
-        view.addSubview(segmentedControl)
-        view.addSubview(activityIndicator)
+        view.addSubview(self.segmentedControl)
+        view.addSubview(self.activityIndicator)
         
         NSLayoutConstraint.activate([
-            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            self.segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            self.segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
     
@@ -110,6 +106,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem
             popoverPresentationController.permittedArrowDirections = .any
             popoverPresentationController.delegate = self
+            popoverPresentationController.backgroundColor = .clear
         }
         self.present(ligandInfoViewController, animated: true, completion: nil)
     }
