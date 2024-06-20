@@ -35,7 +35,8 @@ public class LigandInfoViewController: UIViewController {
     private let backgroundColorButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle("Change Background Color", for: .normal)
-        button.tintColor = .backgroundColor
+        button.tintColor = .foregroundColor
+        button.setTitleColor(.foregroundColor, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -91,6 +92,7 @@ public class LigandInfoViewController: UIViewController {
                 guard let self = self else { return }
                 if let data = data {
                     self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "") Data loaded: \(data.count) bytes"
+                    self.dataLabel.textColor = .foregroundColor
                     self.colorTableView.reloadData()
                     self.colorTableView.backgroundColor = .clear
                 }
