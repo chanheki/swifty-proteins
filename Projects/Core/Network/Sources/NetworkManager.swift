@@ -19,6 +19,8 @@ public final class NetworkManager {
         let baseURL = "https://files.rcsb.org/ligands"
         let endpoint = "\(baseURL)/\(ligandID.prefix(1))/\(ligandID.prefix(3))/\(ligandID)_ideal.pdb"
         
+        print(endpoint)
+        
         guard let url = URL(string: endpoint) else {
             completion(.failure(.invalidURL))
             return
