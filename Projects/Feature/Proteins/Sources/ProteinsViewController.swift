@@ -9,9 +9,10 @@ import UIKit
 import SceneKit
 import Combine
 
+import SharedExtensions
+import SharedCommonUI
 import DomainProteinsInterface
 import DomainProteins
-import SharedCommonUI
 
 public class ProteinsViewController: BaseViewController<ProteinsView> {
     var ligand: LigandModel?
@@ -33,6 +34,18 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         return control
     }()
     
+    private let atomTypeLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .backgroundColor
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        label.text = "Atom Type: "
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -42,6 +55,8 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         
         bindViewModel()
         fetchData(ligandName: self.ligand?.identifier ?? "")
+        
+        setupGestureRecognizers()
     }
     
     private func bindViewModel() {
@@ -55,6 +70,21 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
                 self.activityIndicator.stopAnimating()
             }
             .store(in: &cancellables)
+        
+        self.viewModel.$errorMessage
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] errorMessage in
+                guard let self = self, let errorMessage = errorMessage else { return }
+                self.showErrorView(message: errorMessage)
+                self.activityIndicator.stopAnimating()
+            }
+            .store(in: &cancellables)
+        
+        self.viewModel.atomTypeUpdateHandler = { [weak self] atomType in
+            DispatchQueue.main.async {
+                self?.atomTypeLabel.text = "Atom Type: \(atomType)"
+            }
+        }
     }
     
     private func fetchData(ligandName: String) {
@@ -80,22 +110,33 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func setupView() {
         view.addSubview(self.segmentedControl)
         view.addSubview(self.activityIndicator)
-        
+        view.addSubview(self.atomTypeLabel)
+
         NSLayoutConstraint.activate([
             self.segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             self.segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            self.atomTypeLabel.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            self.atomTypeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            self.atomTypeLabel.widthAnchor.constraint(equalToConstant: 200),
+            self.atomTypeLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
     
     private func setupNavigationRightButton() {
         // TODO: need view separate refactoring
         let largeConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .light, scale: .large)
+        
         let userImage = UIImage(systemName: "info.bubble", withConfiguration: largeConfig)
         let infoButton = UIBarButtonItem(image: userImage, style: .plain, target: self, action: #selector(showInfo))
-        self.navigationItem.rightBarButtonItem = infoButton
+        
+        let shareImage = UIImage(systemName: "square.and.arrow.up", withConfiguration: largeConfig)
+        let shareButton = UIBarButtonItem(image: shareImage, style: .plain, target: self, action: #selector(shareScene))
+        
+        self.navigationItem.rightBarButtonItems = [infoButton, shareButton]
     }
     
     @objc private func showInfo() {
@@ -103,12 +144,30 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         
         ligandInfoViewController.modalPresentationStyle = .popover
         if let popoverPresentationController = ligandInfoViewController.popoverPresentationController {
-            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem
+            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.first
             popoverPresentationController.permittedArrowDirections = .any
             popoverPresentationController.delegate = self
             popoverPresentationController.backgroundColor = .clear
         }
         self.present(ligandInfoViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func shareScene() {
+        guard let proteinsView = self.contentView as? ProteinsView else { return }
+        
+        guard let screenshot = proteinsView.captureScreenshot() else { return }
+        
+        let title = "Ligand \(self.ligand?.identifier ?? "")"
+        let subtitle = "Check out this 3D protein structure!"
+        let textToShare = "\(title)\n\n\(subtitle)"
+        
+        DispatchQueue.main.async {
+            let activityViewController = UIActivityViewController(activityItems: [textToShare, screenshot], applicationActivities: nil)
+            if let popoverPresentationController = activityViewController.popoverPresentationController {
+                popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.last
+            }
+            self.present(activityViewController, animated: true, completion: nil)
+        }
     }
     
     @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
@@ -121,6 +180,41 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             break
         }
     }
+    
+    private func showErrorView(message: String) {
+        let errorView = CustomErrorView(errorMessage: message, parentViewController: self)
+        errorView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(errorView)
+        
+        NSLayoutConstraint.activate([
+            errorView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            errorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            errorView.topAnchor.constraint(equalTo: view.topAnchor),
+            errorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    private func setupGestureRecognizers() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        if let proteinsView = self.contentView as? ProteinsView {
+            proteinsView.sceneView.addGestureRecognizer(tapGesture)
+        }
+    }
+    
+    @objc private func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+        guard let proteinsView = self.contentView as? ProteinsView else { return }
+        
+        let location = gestureRecognize.location(in: proteinsView.sceneView)
+        let hitResults = proteinsView.sceneView.hitTest(location, options: [:])
+        
+        if let result = hitResults.first {
+            if let atomNode = result.node as? SCNNode, let atomType = atomNode.name {
+                viewModel.atomTypeUpdateHandler?(atomType)
+            }
+        }
+    }
+
 }
 
 extension ProteinsViewController: UIPopoverPresentationControllerDelegate {

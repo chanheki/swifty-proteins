@@ -11,6 +11,7 @@ import SceneKit
 
 import DomainProteinsInterface
 import CoreNetwork
+import CoreNetworkInterface
 import SharedExtensions
 
 public class LigandViewModel: ObservableObject {

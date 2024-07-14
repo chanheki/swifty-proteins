@@ -8,10 +8,9 @@
 import UIKit
 import Combine
 
-import DomainBiometric
-import DomainSettingsInterface
 import CoreCoreDataProvider
 import CoreAuthentication
+import DomainSettingsInterface
 
 public final class SettingsViewModel {
     @Published public var settings: [SettingsType]

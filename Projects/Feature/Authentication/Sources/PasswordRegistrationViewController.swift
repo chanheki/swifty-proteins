@@ -28,7 +28,6 @@ open class PasswordRegistrationViewController: UIViewController {
     open func setupUI() {
         view.backgroundColor = .backgroundColor
         
-        // 비밀번호 입력 필드
         passwordTextField = UITextField()
         passwordTextField.placeholder = "비밀번호 등록"
         passwordTextField.isSecureTextEntry = true
@@ -37,7 +36,6 @@ open class PasswordRegistrationViewController: UIViewController {
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         passwordTextField.inputView = UIView()
         
-        // passwordConfirmedTextField 생성
         passwordConfirmedTextField = UITextField()
         passwordConfirmedTextField.placeholder = "비밀번호 확인"
         passwordConfirmedTextField.isSecureTextEntry = true

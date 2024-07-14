@@ -8,13 +8,13 @@
 import UIKit
 import Combine
 
-import FeatureAuthentication
+import SharedCommonUI
+import CoreCoreDataProvider
+import DomainProteins
 import FeatureAuthenticationInterface
 import FeatureProteinsInterface
+import FeatureAuthentication
 import FeatureSettings
-import DomainProteins
-import CoreCoreDataProvider
-import SharedCommonUI
 
 public final class ProteinsListViewController: BaseViewController<ProteinsListView>, UISearchResultsUpdating {
     
@@ -42,7 +42,7 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
             viewModel.$filteredLigands
                 .receive(on: RunLoop.main)
                 .sink { [weak self] _ in
-                    guard let self = self else { return }
+                    guard self != nil else { return }
                     proteinsView.proteinsTableView.reloadData()
                 }
                 .store(in: &cancellables)
@@ -132,17 +132,14 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
 }
 
 extension ProteinsListViewController {
-    // 검색 결과 업데이트 로직
     public func updateSearchResults(for searchController: UISearchController) {
         viewModel?.searchLigands(with: searchController.searchBar.text ?? "")
     }
 }
 
 extension ProteinsListViewController: ProteinsListTableViewDelegate {
-    // ProteinsListTableViewDelegate 구현
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let sectionKey = viewModel?.sectionTitles[indexPath.section] else {
-            // 에러처리뷰 만들어서 넣을 것
             navigationController?.pushViewController(UIViewController(), animated: true)
             return
         }

@@ -91,7 +91,7 @@ public class LigandInfoViewController: UIViewController {
             .sink { [weak self] data in
                 guard let self = self else { return }
                 if let data = data {
-                    self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "") Data loaded: \(data.count) bytes"
+                    self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "Unidentified ID")"
                     self.dataLabel.textColor = .foregroundColor
                     self.colorTableView.reloadData()
                     self.colorTableView.backgroundColor = .clear

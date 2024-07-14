@@ -27,7 +27,7 @@ open class PasswordRegistrationSuccessViewController: UIViewController {
     
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "축하합니다! 비밀번호 등록이 완료되었습니다.\n 10초 뒤에 자동으로 홈 화면으로 이동됩니다."
+        label.text = "비밀번호 등록이 완료되었습니다.\n 10초 뒤에 자동으로 홈 화면으로 이동됩니다."
         label.textColor = .foregroundColor
         label.font = .systemFont(ofSize: 16)
         label.textAlignment = .center
@@ -146,7 +146,6 @@ open class PasswordRegistrationSuccessViewController: UIViewController {
     // MARK: - Actions
     
     @objc public func doneButtonTapped() {
-        // 확인 버튼 클릭 시 처리할 로직
         isAutoCloseEnabled = false
         delegate?.userRegistDidFinish(success: true, error: nil)
     }
