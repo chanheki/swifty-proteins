@@ -6,22 +6,13 @@ let project = Project.makeModule(
     name: ModulePath.Domain.name+ModulePath.Domain.Settings.rawValue,
     targets: [    
         .domain(
-            interface: .Settings,
-            factory: .init(
-                dependencies: [
-                    .core
-                ]
-            )
-        ),
-        .domain(
             implements: .Settings,
             factory: .init(
                 dependencies: [
-                    .domain(interface: .Settings)
+                    .domain(interface: .Settings),
                 ]
             )
         ),
-    
         .domain(
             testing: .Settings,
             factory: .init(
@@ -38,6 +29,13 @@ let project = Project.makeModule(
                 ]
             )
         ),
-
+        .domain(
+            interface: .Settings,
+            factory: .init(
+                dependencies: [
+                    .core
+                ]
+            )
+        ),
     ]
 )
