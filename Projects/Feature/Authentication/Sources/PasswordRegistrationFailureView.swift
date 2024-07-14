@@ -14,14 +14,13 @@ public class PasswordRegistrationFailureView: UIView {
     private let confirmButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("확인", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .blue
+        button.setTitleColor(.backgroundColor, for: .normal)
+        button.backgroundColor = .foregroundColor
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    // 초기화 메서드
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -38,13 +37,11 @@ public class PasswordRegistrationFailureView: UIView {
         addSubview(messageLabel)
         addSubview(confirmButton)
         
-        // messageLabel의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
             messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
         ])
         
-        // confirmButton의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
             confirmButton.centerXAnchor.constraint(equalTo: centerXAnchor),
             confirmButton.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 30),
@@ -52,10 +49,8 @@ public class PasswordRegistrationFailureView: UIView {
             confirmButton.heightAnchor.constraint(equalToConstant: 40)
         ])
         
-        // 확인 버튼 클릭 이벤트 추가
         confirmButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
         
-        // 화면 밖 터치 시 뷰 사라지게 하는 제스처 추가
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissView))
         addGestureRecognizer(tapGesture)
     }
