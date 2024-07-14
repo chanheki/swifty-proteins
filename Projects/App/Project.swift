@@ -24,9 +24,23 @@ let targets: [Target] = [
                     "CFBundleURLTypes": [
                         [
                             "CFBundleTypeRole": "Editor",
-                            "CFBundleURLSchemes": ["com.googleusercontent.apps.711006035349-eec6sk24kp81hr622roopaccnakqh6s6"]
+                            "CFBundleURLSchemes": ["$(GOOGLE_CLIENT_ID)"]
                         ]
-                    ]
+                    ],
+                    "BASE_URL": "$(BASE_URL)",
+                    "UIRequiredDeviceCapabilities": ["armv7"],
+                    "UISupportedInterfaceOrientations": [
+                        "UIInterfaceOrientationPortrait",
+                        "UIInterfaceOrientationLandscapeLeft",
+                        "UIInterfaceOrientationLandscapeRight"
+                    ],
+                    "UISupportedInterfaceOrientations~ipad": [
+                        "UIInterfaceOrientationPortrait",
+                        "UIInterfaceOrientationPortraitUpsideDown",
+                        "UIInterfaceOrientationLandscapeLeft",
+                        "UIInterfaceOrientationLandscapeRight"
+                    ],
+                    "UIBackgroundModes": ["fetch", "processing"]
                 ]
             ),
             dependencies: [
