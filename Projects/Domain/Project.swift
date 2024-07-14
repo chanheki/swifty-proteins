@@ -6,11 +6,11 @@ let targets: [Target] = [
     .domain(
         factory: .init(
             dependencies: [
+                .core,
                 .domain(implements: .Authentication),
                 .domain(implements: .Biometric),
                 .domain(implements: .Proteins),
                 .domain(implements: .Settings),
-                .core,
             ]
         )
     )
