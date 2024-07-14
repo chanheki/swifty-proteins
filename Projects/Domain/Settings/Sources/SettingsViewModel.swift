@@ -11,7 +11,6 @@ import Combine
 import CoreCoreDataProvider
 import CoreAuthentication
 import DomainSettingsInterface
-import DomainBiometric
 
 public final class SettingsViewModel {
     @Published public var settings: [SettingsType]
