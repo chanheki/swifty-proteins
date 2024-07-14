@@ -34,6 +34,18 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         return control
     }()
     
+    private let atomTypeLabel: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = .backgroundColor
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        label.text = "Atom Type: "
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -43,6 +55,8 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         
         bindViewModel()
         fetchData(ligandName: self.ligand?.identifier ?? "")
+        
+        setupGestureRecognizers()
     }
     
     private func bindViewModel() {
@@ -65,6 +79,12 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
                 self.activityIndicator.stopAnimating()
             }
             .store(in: &cancellables)
+        
+        self.viewModel.atomTypeUpdateHandler = { [weak self] atomType in
+            DispatchQueue.main.async {
+                self?.atomTypeLabel.text = "Atom Type: \(atomType)"
+            }
+        }
     }
     
     private func fetchData(ligandName: String) {
@@ -90,13 +110,19 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func setupView() {
         view.addSubview(self.segmentedControl)
         view.addSubview(self.activityIndicator)
-        
+        view.addSubview(self.atomTypeLabel)
+
         NSLayoutConstraint.activate([
             self.segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             self.segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            self.atomTypeLabel.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            self.atomTypeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            self.atomTypeLabel.widthAnchor.constraint(equalToConstant: 200),
+            self.atomTypeLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
     
@@ -168,6 +194,27 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             errorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
+    private func setupGestureRecognizers() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        if let proteinsView = self.contentView as? ProteinsView {
+            proteinsView.sceneView.addGestureRecognizer(tapGesture)
+        }
+    }
+    
+    @objc private func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+        guard let proteinsView = self.contentView as? ProteinsView else { return }
+        
+        let location = gestureRecognize.location(in: proteinsView.sceneView)
+        let hitResults = proteinsView.sceneView.hitTest(location, options: [:])
+        
+        if let result = hitResults.first {
+            if let atomNode = result.node as? SCNNode, let atomType = atomNode.name {
+                viewModel.atomTypeUpdateHandler?(atomType)
+            }
+        }
+    }
+
 }
 
 extension ProteinsViewController: UIPopoverPresentationControllerDelegate {
