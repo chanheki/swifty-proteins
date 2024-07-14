@@ -1,12 +1,20 @@
+//
+//  CustomErrorView.swift
+//  SharedCommonUI
+//
+//  Created by Chan on 7/14/24.
+//
+
 import UIKit
 
-public class PasswordRegistrationFailureView: UIView {
-    // 이 클래스에서 사용할 UI 요소들을 정의합니다.
+public class CustomErrorView: UIView {
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "비밀번호 등록에 실패했습니다. 다시 시도해주세요."
-        label.textColor = .black
+        label.text = "CustomErrorView"
+        label.textColor = .foregroundColor
         label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.numberOfLines = 0
+        label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -21,9 +29,17 @@ public class PasswordRegistrationFailureView: UIView {
         return button
     }()
     
+    private weak var parentViewController: UIViewController?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
+    }
+    
+    public convenience init(errorMessage: String, parentViewController: UIViewController) {
+        self.init(frame: .zero)
+        self.messageLabel.text = errorMessage
+        self.parentViewController = parentViewController
     }
     
     required init?(coder: NSCoder) {
@@ -38,7 +54,8 @@ public class PasswordRegistrationFailureView: UIView {
         addSubview(confirmButton)
         
         NSLayoutConstraint.activate([
-            messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
         ])
         
@@ -57,5 +74,6 @@ public class PasswordRegistrationFailureView: UIView {
     
     @objc private func dismissView() {
         self.removeFromSuperview()
+        parentViewController?.navigationController?.popViewController(animated: true)
     }
 }

@@ -10,8 +10,7 @@ import GoogleSignIn
 import AuthenticationServices
 import FirebaseFirestore
 
-//import CoreCoreDataProvider
-//import CoreData
+import CoreCoreDataProvider
 
 public final class GoogleOAuthManager {
     public static let shared = GoogleOAuthManager()
@@ -19,9 +18,15 @@ public final class GoogleOAuthManager {
     
     public func firebaseConfig() {
         guard FirebaseApp.app() == nil else { return }
-        let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!
-        let options = FirebaseOptions(contentsOfFile: filePath)
-        FirebaseApp.configure(options: options!)
+        guard let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") else {
+            print("GoogleService-Info.plist not found")
+            return
+        }
+        guard let options = FirebaseOptions(contentsOfFile: filePath) else {
+            print("Invalid GoogleService-Info.plist")
+            return
+        }
+        FirebaseApp.configure(options: options)
     }
     
     public func googleOAuthConfig(url: URL) -> Bool {
@@ -36,17 +41,12 @@ public final class GoogleOAuthManager {
         
         let config = GIDConfiguration(clientID: clientID)
         
-        GIDSignIn.sharedInstance.signIn(with: config, presenting: viewController) { user, error in
+        GIDSignIn.sharedInstance.signIn(with: config, presenting: viewController) { [weak self] user, error in
+            guard self != nil else { return }
             if let error = error {
-                        if (error as NSError).code ==
-                            GIDSignInError.canceled.rawValue {
-                            // 사용자가 로그인을 취소한 경우
-                            completion(false, error)
-                        } else {
-                            completion(false, error)
-                        }
-                        return
-                    }
+                completion(false, error)
+                return
+            }
             
             guard let authentication = user?.authentication, let idToken = authentication.idToken else {
                 completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing ID Token"]))
@@ -60,70 +60,72 @@ public final class GoogleOAuthManager {
                     return
                 }
                 
-                guard (authResult?.user.email) != nil else {
-                    completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Email not found"]))
+                guard let user = authResult?.user, let id = authResult?.user.providerID, let name = user.displayName else {
+                    completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "User information not found"]))
                     return
                 }
                 
-                // CoreData에 저장
-                //                AuthenticationManager.shared.saveTokensToCoreData(email, authentication.accessToken, authentication.refreshToken)
-                completion(true, nil)
+                if CoreDataProvider.shared.createUser(id: id, name: name) {
+                    AppStateManager.shared.userID = id
+                    completion(true, nil)
+                } else {
+                    completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Create User Error"]))
+                }
             }
         }
     }
     
-    public func firebaseFetch() -> [String: Any]? {
-        // 현재 로그인한 사용자 객체 가져오기
+    public func firebaseFetch(completion: @escaping ([String: Any]?, Error?) -> Void) {
         guard let currentUser = Auth.auth().currentUser else {
             print("Current user not found")
-            return nil
+            completion(nil, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Current user not found"]))
+            return
         }
         
-        // 사용자 정보 가져오기
         let db = Firestore.firestore()
-        var userInfo: [String: Any]?
         
-        let semaphore = DispatchSemaphore(value: 0)
-        db.collection("users").document(currentUser.uid).getDocument { (snapshot, error) in
+        db.collection("users").document(currentUser.uid).getDocument { snapshot, error in
             if let error = error {
                 print("Error fetching user info: \(error)")
-                semaphore.signal()
+                completion(nil, error)
                 return
             }
             
             if let snapshot = snapshot, snapshot.exists {
-                userInfo = snapshot.data()
+                completion(snapshot.data(), nil)
             } else {
                 print("User document not found")
+                completion(nil, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "User document not found"]))
             }
-            semaphore.signal()
         }
-        
-        semaphore.wait()
-        return userInfo
     }
-
-        
-        public func firebaseSignOut() {
-            let firebaseAuth = Auth.auth()
-            do {
-                try firebaseAuth.signOut()
-            } catch let signOutError as NSError {
-                print("Error signing out: %@", signOutError)
-            }
+    
+    public func firebaseSignOut(completion: @escaping (Bool, Error?) -> Void) {
+        let firebaseAuth = Auth.auth()
+        do {
+            try firebaseAuth.signOut()
+            completion(true, nil)
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+            completion(false, signOutError)
+        }
+    }
+    
+    public func firebaseDeleteAccount(completion: @escaping (Bool, Error?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            print("No signed-in user found")
+            completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No signed-in user found"]))
+            return
         }
         
-        public func firebaseUnsubscribe() {
-            if  let user = Auth.auth().currentUser {
-                user.delete { [self] error in
-                    if let error = error {
-                        print("Firebase Error : ",error)
-                    } else {
-                        print("회원탈퇴 성공!")
-                    }
-                }
+        user.delete { error in
+            if let error = error {
+                print("Firebase Error: ", error)
+                completion(false, error)
             } else {
-                print("로그인 정보가 존재하지 않습니다")
+                print("회원탈퇴 성공!")
+                completion(true, nil)
             }
         }
     }
+}

@@ -8,11 +8,13 @@
 import UIKit
 import Combine
 
-import FeatureSettingsInterface
-import DomainSettings
 import SharedCommonUI
+import DomainSettings
+import FeatureSettingsInterface
+import FeatureAuthenticationInterface
+import FeatureAuthentication
 
-public class SettingsViewController: BaseViewController<SettingsView> {
+public final class SettingsViewController: BaseViewController<SettingsView> {
     
     private var viewModel: SettingsViewModel?
     private var cancellables = Set<AnyCancellable>()
@@ -36,8 +38,24 @@ public class SettingsViewController: BaseViewController<SettingsView> {
                 .$settings
                 .receive(on: RunLoop.main)
                 .sink { [weak self] _ in
-                    guard let self = self else { return }
+                    guard self != nil else { return }
                     settingsView.settingListTableView.reloadData()
+                }
+                .store(in: &cancellables)
+            
+            viewModel.$logoutSuccess
+                .sink { [weak self] success in
+                    if let success = success {
+                        self?.handleLogout(success: success)
+                    }
+                }
+                .store(in: &cancellables)
+
+            viewModel.$deleteAccountSuccess
+                .sink { [weak self] success in
+                    if let success = success {
+                        self?.handleDeleteAccount(success: success)
+                    }
                 }
                 .store(in: &cancellables)
         }
@@ -60,6 +78,57 @@ public class SettingsViewController: BaseViewController<SettingsView> {
         self.title = "Settings"
     }
     
+    
+    private func handleLogout(success: Bool) {
+        if success {
+            // 성공적으로 로그아웃 처리, 예: 로그인 화면으로 전환
+        } else {
+            // 로그아웃 실패 처리, 예: 에러 메시지 표시
+        }
+    }
+
+    private func handleDeleteAccount(success: Bool) {
+        if success {
+            // 성공적으로 회원 탈퇴 처리, 예: 로그인 화면으로 전환
+        } else {
+            // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
+        }
+    }
+    
+    func pushPasswordResetView() {
+        let resetPasswordViewController = PasswordRegistrationViewController()
+        resetPasswordViewController.delegate = self
+        navigationController?.pushViewController(resetPasswordViewController, animated: true)
+    }
+    
+    func showLoginSuccessView() {
+        let loginSuccessViewController = PasswordRegistrationSuccessViewController()
+        loginSuccessViewController.delegate = self
+        self.present(loginSuccessViewController, animated: true)
+    }
+}
+
+extension SettingsViewController: PasswordRegistrationViewControllerDelegate, PasswordRegistrationSuccessViewControllerDelegate {
+    // PasswordRegistrationViewControllerDelegate
+    public func passwordRegistDidFinish(success: Bool, error: Error?) {
+        if success {
+            print("비밀번호 변경 성공")
+            navigationController?.popViewController(animated: true)
+            self.showLoginSuccessView()
+        } else {
+            print("비밀번호 변겅 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
+    
+    // PasswordRegistrationSuccessViewControllerDelegate
+    public func userRegistDidFinish(success: Bool, error: Error?) {
+        if success {
+            print("비밀번호 변경 끝")
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
+        }
+    }
 }
 
 extension SettingsViewController: SettingsListTableViewDelegate {
@@ -71,13 +140,11 @@ extension SettingsViewController: SettingsListTableViewDelegate {
         
         switch setting {
         case .id:
-            // ID 확인 로직
+            viewModel.performAction(for: .id)
             break
             
         case .resetPassword:
-            // 비밀번호 재설정 뷰 컨트롤러로 이동
-            let resetPasswordVC = SettingsViewController()
-            navigationController?.pushViewController(resetPasswordVC, animated: true)
+            self.pushPasswordResetView()
             
         case .biometric:
             // 생체 인식 설정 로직 (스위치로 처리)
@@ -87,9 +154,9 @@ extension SettingsViewController: SettingsListTableViewDelegate {
             viewModel.performAction(for: .logout)
             // 로그아웃 후 보여질 view 설정.
             break
-        case .unsubscribe:
+        case .deleteAccount:
             // 삭제전 보여질 view 설정
-            viewModel.performAction(for: .unsubscribe)
+            viewModel.performAction(for: .deleteAccount)
             // 삭제 후 보여질 view 설정
             break
         }

@@ -28,14 +28,15 @@ public class LigandInfoViewController: UIViewController {
     
     private lazy var colorTableView: LigandInfoColorTableView = {
         let tableView = LigandInfoColorTableView(viewModel: viewModel)
-        tableView.setColorTableViewDelegate(self)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
     private let backgroundColorButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitle("Change Background Color", for: .normal)
-        button.tintColor = .backgroundColor
+        button.tintColor = .foregroundColor
+        button.setTitleColor(.foregroundColor, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -59,7 +60,7 @@ public class LigandInfoViewController: UIViewController {
     }
     
     private func setupProperty() {
-        view.backgroundColor = .foregroundColor.withAlphaComponent(0.5)
+        view.backgroundColor = .clear
     }
     
     private func setupView() {
@@ -90,7 +91,10 @@ public class LigandInfoViewController: UIViewController {
             .sink { [weak self] data in
                 guard let self = self else { return }
                 if let data = data {
-                    self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "") Data loaded: \(data.count) bytes"
+                    self.dataLabel.text = "\(self.viewModel.ligand?.identifier ?? "Unidentified ID")"
+                    self.dataLabel.textColor = .foregroundColor
+                    self.colorTableView.reloadData()
+                    self.colorTableView.backgroundColor = .clear
                 }
             }
             .store(in: &cancellables)
@@ -112,12 +116,6 @@ public class LigandInfoViewController: UIViewController {
 extension LigandInfoViewController: CustomColorPickerDelegate {
     public func customColorPicker(_ picker: CustomColorPickerViewControllerProtocol, didSelectColor color: UIColor, for element: String) {
         viewModel.updateBackgroundColor(color)
-    }
-}
-
-extension LigandInfoViewController: ColorTableViewDelegate {
-    public func colorCell(_ cell: ColorCellProtocol, didUpdateColor color: UIColor, for element: String) {
-        viewModel.updateColor(color, for: element)
     }
 }
 

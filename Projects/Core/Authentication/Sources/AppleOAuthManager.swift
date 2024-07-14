@@ -10,6 +10,8 @@ import CryptoKit
 
 import FirebaseAuth
 
+import CoreCoreDataProvider
+
 public final class AppleOAuthManager: NSObject {
     public static let shared = AppleOAuthManager()
     
@@ -65,41 +67,36 @@ extension AppleOAuthManager {
 extension AppleOAuthManager: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            guard let nonce = currentNonce else {
-                fatalError("Invalid state: A login callback was received, but no login request was sent.")
-            }
-            guard let appleIDToken = appleIDCredential.identityToken else {
-                completion?(false, NSError(domain: "AppleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to fetch identity token"]))
-                return
-            }
-            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                completion?(false, NSError(domain: "AppleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to serialize token string"]))
+            guard let nonce = currentNonce,
+                  let appleIDToken = appleIDCredential.identityToken,
+                  let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                self.completion?(false, NSError(domain: "AppleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from Apple ID service"]))
                 return
             }
             
-            let credential = OAuthProvider.credential(withProviderID: "apple.com",
-                                                      idToken: idTokenString,
-                                                      rawNonce: nonce)
-            
-            Auth.auth().signIn(with: credential) { (authResult, error) in
+            let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
+            Auth.auth().signIn(with: credential) { [weak self] (authResult, error) in
+                guard let self = self else { return }
                 if let error = error {
                     self.completion?(false, error)
                     return
                 }
                 
-                if let user = authResult?.user {
-                    let changeRequest = user.createProfileChangeRequest()
-                    if let fullName = appleIDCredential.fullName {
-                        changeRequest.displayName = [fullName.givenName, fullName.familyName].compactMap { $0 }.joined(separator: " ")
-                    }
-                    changeRequest.commitChanges { (error) in
-                        if let error = error {
-                            self.completion?(false, error)
-                            return
-                        }
-                        self.completion?(true, nil)
+                guard (authResult?.user) != nil else {
+                    self.completion?(false, NSError(domain: "AppleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Firebase authentication failed"]))
+                    return
+                }
+                
+                // 프로필 변경이 완료된 후에 이름과 ID를 저장
+                if let fullName = appleIDCredential.fullName {
+                    let displayName = [fullName.givenName, fullName.familyName].compactMap { $0 }.joined(separator: " ")
+                    if !CoreDataProvider.shared.createUser(id: appleIDCredential.user, name: displayName) {
+                        self.completion?(false, error)
                     }
                 }
+                
+                AppStateManager.shared.userID = appleIDCredential.user
+                self.completion?(true, nil)
             }
         }
     }
@@ -112,6 +109,9 @@ extension AppleOAuthManager: ASAuthorizationControllerDelegate {
 
 extension AppleOAuthManager: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return UIApplication.shared.windows.first { $0.isKeyWindow } ?? UIWindow()
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow } ?? UIWindow()
     }
 }

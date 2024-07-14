@@ -5,42 +5,56 @@
 //  Created by Chan on 6/4/24.
 //
 
+import UIKit
 import Combine
 
-import DomainSettingsInterface
+import CoreCoreDataProvider
 import CoreAuthentication
+import DomainSettingsInterface
 
 public final class SettingsViewModel {
-    // Output
     @Published public var settings: [SettingsType]
+    @Published public var logoutSuccess: Bool?
+    @Published public var deleteAccountSuccess: Bool?
     
-    // 생성자
-    public init(settings: [SettingsType] = [.id, .resetPassword, .biometric, .logout, .unsubscribe]) {
+    public init(settings: [SettingsType] = [.id, .resetPassword, .biometric, .logout, .deleteAccount]) {
         self.settings = settings
     }
     
-    // Input
+    public func toggleBiometric(_ isOn: Bool) {
+        AppStateManager.shared.isBiometricEnabled = isOn
+    }
+    
     public func performAction(for setting: SettingsType) {
         switch setting {
         case .id:
+            print(CoreDataProvider.shared.fetchAllUsers())
             // ID 관련 로직 처리
             break
-        case .resetPassword:
-            // 비밀번호 재설정 로직 처리
-            break
-        case .biometric:
-            
-            break
         case .logout:
-            GoogleOAuthManager.shared.firebaseSignOut()
+            GoogleOAuthManager.shared.firebaseSignOut { success, error in
+                if success {
+                    CoreDataProvider.shared.clearCoreData()
+                    self.logoutSuccess = true
+                } else {
+                    // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
+                    self.logoutSuccess = false
+                }
+            }
             break
-        case .unsubscribe:
-            GoogleOAuthManager.shared.firebaseUnsubscribe()
+        case .deleteAccount:
+            GoogleOAuthManager.shared.firebaseDeleteAccount { success, error in
+                if success {
+                    CoreDataProvider.shared.clearCoreData()
+                    self.deleteAccountSuccess = true
+                } else {
+                    // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
+                    self.deleteAccountSuccess = false
+                }
+            }
+            break
+        case .resetPassword, .biometric:
             break
         }
-    }
-    
-    public func toggleBiometric(_ isOn: Bool) {
-        // 생체 인식 설정 상태 변경 로직 처리
     }
 }

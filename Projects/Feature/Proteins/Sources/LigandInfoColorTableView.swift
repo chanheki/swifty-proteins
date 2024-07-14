@@ -15,7 +15,6 @@ import SharedCommonUI
 public class LigandInfoColorTableView: UITableView {
     
     private var viewModel: LigandViewModel
-    private var colorTableViewDelegate: ColorTableViewDelegate?
     
     public init(viewModel: LigandViewModel) {
         self.viewModel = viewModel
@@ -38,24 +37,17 @@ public class LigandInfoColorTableView: UITableView {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.backgroundColor = .clear
     }
-    
-    public func setColorTableViewDelegate(_ delegate: ColorTableViewDelegate) {
-        self.colorTableViewDelegate = delegate
-    }
 }
 
 extension LigandInfoColorTableView: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.elements.count
+        return viewModel.usedElements.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ColorCell.identifier, for: indexPath) as! ColorCell
-        let element = viewModel.elements[indexPath.row]
-        cell.configure(with: element, color: viewModel.color(for: element))
-        cell.delegate = colorTableViewDelegate
+        let element = viewModel.usedElements[indexPath.row]
+        cell.configure(with: element, color: viewModel.color(for: element), count: viewModel.countForElement(element))
         return cell
     }
 }
-
-public protocol ColorTableViewDelegate: ColorCellDelegate {}

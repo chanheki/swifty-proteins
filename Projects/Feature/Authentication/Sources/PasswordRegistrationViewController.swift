@@ -10,7 +10,7 @@ import SharedCommonUI
 open class PasswordRegistrationViewController: UIViewController {
     
     // MARK: - Properties
-    public weak var delegate: PasswordRegistrationViewControllerDelegate?
+    open weak var delegate: PasswordRegistrationViewControllerDelegate?
     
     open var passwordTextField: UITextField!
     open var passwordConfirmedTextField: UITextField!
@@ -28,22 +28,22 @@ open class PasswordRegistrationViewController: UIViewController {
     open func setupUI() {
         view.backgroundColor = .backgroundColor
         
-        // 비밀번호 입력 필드
         passwordTextField = UITextField()
-        passwordTextField.placeholder = "비밀번호 입력"
+        passwordTextField.placeholder = "비밀번호 등록"
         passwordTextField.isSecureTextEntry = true
         passwordTextField.font = .systemFont(ofSize: 24)
         passwordTextField.textAlignment = .center
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordTextField.inputView = UIView()
         
-        // passwordConfirmedTextField 생성
         passwordConfirmedTextField = UITextField()
         passwordConfirmedTextField.placeholder = "비밀번호 확인"
         passwordConfirmedTextField.isSecureTextEntry = true
         passwordConfirmedTextField.font = .systemFont(ofSize: 24)
         passwordConfirmedTextField.textAlignment = .center
         passwordConfirmedTextField.translatesAutoresizingMaskIntoConstraints = false
-        passwordConfirmedTextField.isHidden = true // 초기에는 숨겨둡니다.
+        passwordConfirmedTextField.isHidden = true
+        passwordConfirmedTextField.inputView = UIView()
         
         // 숫자 버튼
         let buttonSpacing: CGFloat = 16 // 버튼 간 간격 설정
@@ -72,21 +72,20 @@ open class PasswordRegistrationViewController: UIViewController {
             [7, 8, 9],
             [4, 5, 6],
             [1, 2, 3],
-            [0, nil, "취소"]
+            [nil, 0, "취소"]
         ]
-
+        
         for row in numberButtons {
             let rowStackView = UIStackView()
             rowStackView.axis = .horizontal
             rowStackView.distribution = .fillEqually
             rowStackView.spacing = buttonSpacing
-
+            
             for number in row {
                 let button = UIButton(type: .system)
                 if number as? String != nil {
                     let buttonImage = UIImage(systemName: "delete.left")
                     button.setImage(buttonImage, for: .normal)
-//                    self.setButtonProperties(_button: button, _rowStackView: rowStackView)
                     button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
                     button.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
                     passwordButtons.append(button)
@@ -103,7 +102,7 @@ open class PasswordRegistrationViewController: UIViewController {
                 button.titleLabel?.font = .systemFont(ofSize: 24, weight: .bold)
                 button.tintColor = .foregroundColor
             }
-
+            
             buttonStackView.addArrangedSubview(rowStackView)
         }
         
@@ -126,17 +125,17 @@ open class PasswordRegistrationViewController: UIViewController {
         passwordButtons.append(_button)
         _rowStackView.addArrangedSubview(_button)
     }
-
+    
     @objc private func numberButtonTapped(_ sender: UIButton) {
         guard let number = sender.titleLabel?.text else { return }
         let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
+        generator.impactOccurred()
         appendToPasswordField(number)
     }
     
     @objc private func deleteButtonTapped(_ sender: UIButton) {
         let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
+        generator.impactOccurred()
         deleteFromPasswordField()
     }
     
@@ -157,8 +156,11 @@ open class PasswordRegistrationViewController: UIViewController {
                     // 비밀번호 검증 로직
                     if passwordTextField.text == passwordConfirmedTextField.text {
                         //CoreData 저장 및 MainView 이동
-                        CoreDataProvider.shared.saveTokensToCoreData(password: passwordTextField.text!)
-                        self.delegate?.passwordRegistDidFinish(success: true, error: nil)
+                        if CoreDataProvider.shared.updatePasswordForCurrentUser(password: passwordTextField.text!) {
+                            self.delegate?.passwordRegistDidFinish(success: true, error: nil)
+                        } else {
+                            self.delegate?.passwordRegistDidFinish(success: false, error: nil)
+                        }
                         
                     } else {
                         // 비밀번호 등록 실패 시 PasswordRegistrationFailureView 보여주기

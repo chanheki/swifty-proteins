@@ -8,9 +8,8 @@
 import UIKit
 
 public protocol ColorCellProtocol: UITableViewCell {
-    var delegate: ColorCellDelegate? { get set }
     var element: String? { get set }
-    func configure(with element: String, color: UIColor)
+    func configure(with element: String, color: UIColor, count: Int)
 }
 
 public protocol ColorCellDelegate: AnyObject {

@@ -53,11 +53,9 @@ public struct TargetFactory {
             base: [
                 "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
             ],
-            debug: [
-                "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
-            ],
-            release: [
-                "ENABLE_USER_SCRIPT_SANDBOXING": "YES"
+            configurations: [
+                .debug(name: "Debug", xcconfig: .relativeToRoot("Configs/Debug.xcconfig")),
+                .release(name: "Release", xcconfig: .relativeToRoot("Configs/Release.xcconfig"))
             ],
             defaultSettings: .recommended
         ),

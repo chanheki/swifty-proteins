@@ -6,19 +6,13 @@ let project = Project.makeModule(
     name: ModulePath.Feature.name+ModulePath.Feature.Proteins.rawValue,
     targets: [    
         .feature(
-            interface: .Proteins,
-            factory: .init(
-                dependencies: [
-                    .domain
-                ]
-            )
-        ),
-        .feature(
             implements: .Proteins,
             factory: .init(
                 dependencies: [
                     .feature(interface: .Proteins),
-                    .feature(testing: .Proteins)
+                    .feature(testing: .Proteins),
+                    .feature(interface: .Authentication),
+                    .feature(interface: .Settings),
                 ]
             )
         ),
@@ -37,6 +31,14 @@ let project = Project.makeModule(
                     .feature(implements: .Proteins)
                 ]
             )
-        )
+        ),
+        .feature(
+            interface: .Proteins,
+            factory: .init(
+                dependencies: [
+                    .domain
+                ]
+            )
+        ),
     ]
 )
