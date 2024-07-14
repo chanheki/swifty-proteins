@@ -8,7 +8,7 @@
 @_exported import FeatureProteins
 @_exported import FeatureProteinsInterface
 @_exported import FeatureProteinsTesting
-@_exported import FeatureAuthentication
-@_exported import FeatureAuthenticationInterface
 @_exported import FeatureSettings
 @_exported import FeatureSettingsInterface
+@_exported import FeatureAuthentication
+@_exported import FeatureAuthenticationInterface

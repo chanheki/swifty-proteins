@@ -9,9 +9,10 @@ import UIKit
 import SceneKit
 import Combine
 
+import SharedExtensions
+import SharedCommonUI
 import DomainProteinsInterface
 import DomainProteins
-import SharedCommonUI
 
 public class ProteinsViewController: BaseViewController<ProteinsView> {
     var ligand: LigandModel?
@@ -52,6 +53,15 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
                 guard let self = self, let scene = scene else { return }
                 let proteinsView = self.contentView as! ProteinsView
                 proteinsView.sceneView.scene = scene
+                self.activityIndicator.stopAnimating()
+            }
+            .store(in: &cancellables)
+        
+        self.viewModel.$errorMessage
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] errorMessage in
+                guard let self = self, let errorMessage = errorMessage else { return }
+                self.showErrorView(message: errorMessage)
                 self.activityIndicator.stopAnimating()
             }
             .store(in: &cancellables)
@@ -118,16 +128,20 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     
     @objc private func shareScene() {
         guard let proteinsView = self.contentView as? ProteinsView else { return }
-        let renderer = SCNRenderer(device: nil, options: nil)
-        renderer.scene = proteinsView.sceneView.scene
-        let size = proteinsView.sceneView.bounds.size
-        let image = renderer.snapshot(atTime: 0, with: size, antialiasingMode: .multisampling4X)
         
-        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        if let popoverPresentationController = activityViewController.popoverPresentationController {
-            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.last
+        guard let screenshot = proteinsView.captureScreenshot() else { return }
+        
+        let title = "Ligand \(self.ligand?.identifier ?? "")"
+        let subtitle = "Check out this 3D protein structure!"
+        let textToShare = "\(title)\n\n\(subtitle)"
+        
+        DispatchQueue.main.async {
+            let activityViewController = UIActivityViewController(activityItems: [textToShare, screenshot], applicationActivities: nil)
+            if let popoverPresentationController = activityViewController.popoverPresentationController {
+                popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.last
+            }
+            self.present(activityViewController, animated: true, completion: nil)
         }
-        self.present(activityViewController, animated: true, completion: nil)
     }
     
     @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
@@ -139,6 +153,20 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         default:
             break
         }
+    }
+    
+    private func showErrorView(message: String) {
+        let errorView = CustomErrorView(errorMessage: message, parentViewController: self)
+        errorView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(errorView)
+        
+        NSLayoutConstraint.activate([
+            errorView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            errorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            errorView.topAnchor.constraint(equalTo: view.topAnchor),
+            errorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }
 
