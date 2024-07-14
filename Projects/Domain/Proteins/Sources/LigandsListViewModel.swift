@@ -11,18 +11,13 @@ import DomainProteinsInterface
 
 public final class LigandsListViewModel {
     
-    // 앞글자 section
     @Published public var ligandsBySection: [String: [LigandModel]] = [:]
-    // 검색된 Ligands
     @Published public var filteredLigands: [LigandModel] = [] {
         didSet {
             self.organizeLigandsIntoSections()
         }
     }
-    // Full ligands
     public var ligands: [LigandModel] = []
-    // 섹션별로 정렬된 Ligands
-    // 섹션 타이틀 배열
     public var sectionTitles: [String] = []
     
     public init() {
@@ -41,7 +36,6 @@ public final class LigandsListViewModel {
         var sections: [String: [LigandModel]] = [:]
         
         for ligand in filteredLigands {
-            // Ligand 식별자의 첫 글자를 섹션 키로 사용
             let sectionKey = String(ligand.identifier.prefix(1))
             if sections[sectionKey] == nil {
                 sections[sectionKey] = [ligand]
@@ -50,7 +44,6 @@ public final class LigandsListViewModel {
             }
         }
         
-        // 섹션 타이틀을 알파벳 순으로 정렬
         sectionTitles = sections.keys.sorted()
         ligandsBySection = sections
     }
