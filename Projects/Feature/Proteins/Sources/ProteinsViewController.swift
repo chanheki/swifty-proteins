@@ -93,9 +93,14 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func setupNavigationRightButton() {
         // TODO: need view separate refactoring
         let largeConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .light, scale: .large)
+        
         let userImage = UIImage(systemName: "info.bubble", withConfiguration: largeConfig)
         let infoButton = UIBarButtonItem(image: userImage, style: .plain, target: self, action: #selector(showInfo))
-        self.navigationItem.rightBarButtonItem = infoButton
+        
+        let shareImage = UIImage(systemName: "square.and.arrow.up", withConfiguration: largeConfig)
+        let shareButton = UIBarButtonItem(image: shareImage, style: .plain, target: self, action: #selector(shareScene))
+        
+        self.navigationItem.rightBarButtonItems = [infoButton, shareButton]
     }
     
     @objc private func showInfo() {
@@ -103,12 +108,26 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         
         ligandInfoViewController.modalPresentationStyle = .popover
         if let popoverPresentationController = ligandInfoViewController.popoverPresentationController {
-            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem
+            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.first
             popoverPresentationController.permittedArrowDirections = .any
             popoverPresentationController.delegate = self
             popoverPresentationController.backgroundColor = .clear
         }
         self.present(ligandInfoViewController, animated: true, completion: nil)
+    }
+    
+    @objc private func shareScene() {
+        guard let proteinsView = self.contentView as? ProteinsView else { return }
+        let renderer = SCNRenderer(device: nil, options: nil)
+        renderer.scene = proteinsView.sceneView.scene
+        let size = proteinsView.sceneView.bounds.size
+        let image = renderer.snapshot(atTime: 0, with: size, antialiasingMode: .multisampling4X)
+        
+        let activityViewController = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        if let popoverPresentationController = activityViewController.popoverPresentationController {
+            popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItems?.last
+        }
+        self.present(activityViewController, animated: true, completion: nil)
     }
     
     @objc private func segmentedControlChanged(_ sender: UISegmentedControl) {
