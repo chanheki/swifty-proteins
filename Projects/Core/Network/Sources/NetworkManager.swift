@@ -13,10 +13,22 @@ import CoreNetworkInterface
 public final class NetworkManager {
     
     public static let shared = NetworkManager()
-    private init() {}
+    
+    private let session: Session
+    
+    private init() {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 5
+        configuration.timeoutIntervalForResource = 15
+        self.session = Session(configuration: configuration)
+    }
     
     public func fetchLigandData(for ligandID: String, completion: @escaping (Result<Data, NetworkError>) -> Void) {
-        let baseURL = "https://files.rcsb.org/ligands"
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String else {
+            completion(.failure(.invalidURL))
+            return
+        }
+
         let endpoint = "\(baseURL)/\(ligandID.prefix(1))/\(ligandID.prefix(3))/\(ligandID)_ideal.pdb"
         
         print(endpoint)
@@ -26,7 +38,7 @@ public final class NetworkManager {
             return
         }
         
-        AF.request(url).validate().responseData { response in
+        session.request(url).validate().responseData { response in
             switch response.result {
             case .success(let data):
                 completion(.success(data))
@@ -35,4 +47,5 @@ public final class NetworkManager {
             }
         }
     }
+
 }
