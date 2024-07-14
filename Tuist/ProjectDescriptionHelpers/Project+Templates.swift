@@ -8,7 +8,7 @@ public extension Project {
         let packages: [Package] = []
         let settings: Settings? = Settings.settings(
             base: [
-                "DEVELOPMENT_TEAM": "",
+                "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)",
                 "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES"
             ],
             configurations: [
