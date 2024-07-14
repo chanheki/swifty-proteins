@@ -20,7 +20,7 @@ let targets: [Target] = [
                             ]
                         ]
                     ],
-                    "NSFaceIDUsageDescription": "Please authenticate to proceed.",
+                    "NSFaceIDUsageDescription": "We need access to Face ID for authentication.",
                     "CFBundleURLTypes": [
                         [
                             "CFBundleTypeRole": "Editor",
@@ -28,18 +28,6 @@ let targets: [Target] = [
                         ]
                     ],
                     "BASE_URL": "$(BASE_URL)",
-                    "UIRequiredDeviceCapabilities": ["armv7"],
-                    "UISupportedInterfaceOrientations": [
-                        "UIInterfaceOrientationPortrait",
-                        "UIInterfaceOrientationLandscapeLeft",
-                        "UIInterfaceOrientationLandscapeRight"
-                    ],
-                    "UISupportedInterfaceOrientations~ipad": [
-                        "UIInterfaceOrientationPortrait",
-                        "UIInterfaceOrientationPortraitUpsideDown",
-                        "UIInterfaceOrientationLandscapeLeft",
-                        "UIInterfaceOrientationLandscapeRight"
-                    ],
                     "UIBackgroundModes": ["fetch", "processing"]
                 ]
             ),
