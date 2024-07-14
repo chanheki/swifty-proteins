@@ -14,7 +14,6 @@ import SharedCommonUI
 
 public class DeleteAccountViewController: UIView {
     
-    // 이 클래스에서 사용할 UI 요소들을 정의합니다.
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.text = "Do you want to delete account? Really..?."
@@ -34,7 +33,6 @@ public class DeleteAccountViewController: UIView {
         return button
     }()
     
-    // 초기화 메서드
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -51,13 +49,11 @@ public class DeleteAccountViewController: UIView {
         addSubview(messageLabel)
         addSubview(confirmButton)
         
-        // messageLabel의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
             messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
         ])
         
-        // confirmButton의 레이아웃 제약조건 설정
         NSLayoutConstraint.activate([
             confirmButton.centerXAnchor.constraint(equalTo: centerXAnchor),
             confirmButton.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 30),
