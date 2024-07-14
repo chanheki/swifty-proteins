@@ -28,7 +28,9 @@ let targets: [Target] = [
                         ]
                     ],
                     "BASE_URL": "$(BASE_URL)",
-                    "UIBackgroundModes": ["fetch", "processing"]
+                    "UIBackgroundModes": ["fetch", "processing"],
+                    "NSCameraUsageDescription": "We need access to the camera for taking photos.",
+                    "NSPhotoLibraryUsageDescription": "We need access to your photo library to select and share photos."
                 ]
             ),
             dependencies: [
