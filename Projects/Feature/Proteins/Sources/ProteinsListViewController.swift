@@ -12,8 +12,8 @@ import SharedCommonUI
 import CoreCoreDataProvider
 import DomainProteins
 import FeatureAuthenticationInterface
-import FeatureAuthentication
 import FeatureProteinsInterface
+import FeatureAuthentication
 import FeatureSettings
 
 public final class ProteinsListViewController: BaseViewController<ProteinsListView>, UISearchResultsUpdating {
@@ -140,7 +140,6 @@ extension ProteinsListViewController {
 extension ProteinsListViewController: ProteinsListTableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let sectionKey = viewModel?.sectionTitles[indexPath.section] else {
-            // 에러처리뷰 만들어서 넣을 것
             navigationController?.pushViewController(UIViewController(), animated: true)
             return
         }

@@ -8,11 +8,11 @@
 import UIKit
 import Combine
 
-import FeatureAuthentication
-import FeatureAuthenticationInterface
-import FeatureSettingsInterface
-import DomainSettings
 import SharedCommonUI
+import DomainSettings
+import FeatureSettingsInterface
+import FeatureAuthenticationInterface
+import FeatureAuthentication
 
 public final class SettingsViewController: BaseViewController<SettingsView> {
     
