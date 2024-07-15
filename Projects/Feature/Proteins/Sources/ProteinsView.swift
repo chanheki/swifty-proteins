@@ -73,20 +73,20 @@ open class ProteinsView: UIView {
         tooltipLabel.text = "Atom Type: \(text)"
         
         DispatchQueue.main.async {
-            var adjustedX = position.x
-            var adjustedY = position.y
+            let tooltipWidth: CGFloat = 200
+            let tooltipHeight: CGFloat = 50
             
-            // Adjust to keep tooltip within the bounds of the view
+            var adjustedX = position.x - tooltipWidth / 2
+            var adjustedY = position.y - tooltipHeight - 10
+            
             if adjustedX < 10 {
                 adjustedX = 10
-            } else if adjustedX + self.tooltipView.frame.width > self.bounds.width - 10 {
-                adjustedX = self.bounds.width - self.tooltipView.frame.width - 10
+            } else if adjustedX + tooltipWidth > self.bounds.width - 10 {
+                adjustedX = self.bounds.width - tooltipWidth - 10
             }
             
             if adjustedY < 10 {
-                adjustedY = 10
-            } else if adjustedY + self.tooltipView.frame.height > self.bounds.height - 10 {
-                adjustedY = self.bounds.height - self.tooltipView.frame.height - 10
+                adjustedY = position.y + 10
             }
             
             self.tooltipView.frame.origin = CGPoint(x: adjustedX, y: adjustedY)
