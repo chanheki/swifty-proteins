@@ -221,8 +221,10 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         let hitResults = proteinsView.sceneView.hitTest(location, options: [SCNHitTestOption.searchMode: SCNHitTestSearchMode.all.rawValue])
         
         if let result = hitResults.first {
+            if result.node.name == "stick" { return }
             let atomType = result.node.name ?? "Unknown"
-            showTooltip(at: location, with: atomType)
+            let convertedLocation = proteinsView.sceneView.convert(location, to: view)
+            showTooltip(at: convertedLocation, with: atomType)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -245,8 +247,19 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         let tooltipWidth: CGFloat = 200
         let tooltipHeight: CGFloat = 50
         
-        let adjustedX = max(min(position.x - tooltipWidth / 2, view.bounds.width - tooltipWidth), 0)
-        let adjustedY = max(min(position.y - tooltipHeight / 2, view.bounds.height - tooltipHeight), 0)
+        var adjustedX = position.x - tooltipWidth / 2
+        var adjustedY = position.y - tooltipHeight - 10
+        
+        // Adjust to keep tooltip within the bounds of the view
+        if adjustedX < 10 {
+            adjustedX = 10
+        } else if adjustedX + tooltipWidth > view.bounds.width - 10 {
+            adjustedX = view.bounds.width - tooltipWidth - 10
+        }
+        
+        if adjustedY < 10 {
+            adjustedY = position.y + 10
+        }
         
         tooltipView.frame = CGRect(x: adjustedX, y: adjustedY, width: tooltipWidth, height: tooltipHeight)
     }
