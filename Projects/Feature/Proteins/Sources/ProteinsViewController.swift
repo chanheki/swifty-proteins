@@ -212,7 +212,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         view.addGestureRecognizer(dismissTooltipGesture)
     }
     
-    @objc private func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+    @objc private func handleTap(_ gestureRecognize: UITapGestureRecognizer) {
         guard let proteinsView = self.contentView as? ProteinsView else { return }
         
         let location = gestureRecognize.location(in: proteinsView.sceneView)
@@ -221,7 +221,8 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         if let result = hitResults.first {
             if result.node.name == "stick" { return }
             let atomType = result.node.name ?? "Unknown"
-            showTooltip(at: location, with: atomType)
+            let convertedLocation = proteinsView.sceneView.convert(location, to: view)
+            showTooltip(at: convertedLocation, with: atomType)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -229,7 +230,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         }
     }
     
-    @objc private func dismissTooltip(_ gestureRecognize: UIGestureRecognizer) {
+    @objc private func dismissTooltip(_ gestureRecognize: UITapGestureRecognizer) {
         let location = gestureRecognize.location(in: view)
         if tooltipView.frame.contains(location) {
             return
@@ -240,7 +241,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func showTooltip(at position: CGPoint, with text: String) {
         print(position.x, position.y, text)
         tooltipLabel.text = "Atom Type: \(text)"
-        tooltipView.isHidden = false
         
         let tooltipWidth: CGFloat = 200
         let tooltipHeight: CGFloat = 50
@@ -261,6 +261,10 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         tooltipView.center = position
         tooltipView.frame.origin.y = adjustedY
         tooltipView.frame.origin.x = adjustedX
+        tooltipView.isHidden = false
+        
+        print("position", tooltipView.frame.origin.y,
+              tooltipView.frame.origin.x)
     }
 }
 
