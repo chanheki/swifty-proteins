@@ -124,8 +124,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            self.tooltipView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            self.tooltipView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
             self.tooltipView.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
             
             self.tooltipLabel.topAnchor.constraint(equalTo: tooltipView.topAnchor, constant: 10),
@@ -244,9 +242,25 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         tooltipLabel.text = "Atom Type: \(text)"
         tooltipView.isHidden = false
         
+        let tooltipWidth: CGFloat = 200
+        let tooltipHeight: CGFloat = 50
+        
+        var adjustedX = position.x - tooltipWidth / 2
+        var adjustedY = position.y - tooltipHeight - 10
+        
+        if adjustedX < 10 {
+            adjustedX = 10
+        } else if adjustedX + tooltipWidth > view.bounds.width - 10 {
+            adjustedX = view.bounds.width - tooltipWidth - 10
+        }
+        
+        if adjustedY < 10 {
+            adjustedY = position.y + 10
+        }
+
         tooltipView.center = position
-        tooltipView.frame.origin.y -= tooltipView.frame.height / 2
-        tooltipView.frame.origin.x -= tooltipView.frame.width / 2
+        tooltipView.frame.origin.y = adjustedY
+        tooltipView.frame.origin.x = adjustedX
     }
 }
 
