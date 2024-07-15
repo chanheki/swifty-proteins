@@ -34,28 +34,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         return control
     }()
     
-    private let tooltipView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 8
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.3
-        view.layer.shadowOffset = CGSize(width: 0, height: 2)
-        view.layer.shadowRadius = 4
-        view.isHidden = true
-        return view
-    }()
-    
-    private let tooltipLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .black
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
-    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -114,24 +92,13 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func setupView() {
         view.addSubview(self.segmentedControl)
         view.addSubview(self.activityIndicator)
-        view.addSubview(self.tooltipView)
-        self.tooltipView.addSubview(self.tooltipLabel)
         
         NSLayoutConstraint.activate([
             self.segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             self.segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            
-            self.tooltipView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            self.tooltipView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
-            self.tooltipView.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
-            
-            self.tooltipLabel.topAnchor.constraint(equalTo: tooltipView.topAnchor, constant: 10),
-            self.tooltipLabel.leadingAnchor.constraint(equalTo: tooltipView.leadingAnchor, constant: 10),
-            self.tooltipLabel.trailingAnchor.constraint(equalTo: tooltipView.trailingAnchor, constant: -10),
-            self.tooltipLabel.bottomAnchor.constraint(equalTo: tooltipView.bottomAnchor, constant: -10),
+            self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -221,34 +188,16 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         let hitResults = proteinsView.sceneView.hitTest(location, options: [SCNHitTestOption.searchMode: SCNHitTestSearchMode.all.rawValue])
         
         if let result = hitResults.first {
+            if result.node.name == "stick" { return }
             let atomType = result.node.name ?? "Unknown"
-            showTooltip(at: location, with: atomType)
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.tooltipView.isHidden = true
+            let convertedLocation = proteinsView.sceneView.convert(location, to: view)
+            proteinsView.showTooltip(at: convertedLocation, with: atomType)
         }
     }
     
-    @objc private func dismissTooltip(_ gestureRecognize: UIGestureRecognizer) {
-        let location = gestureRecognize.location(in: view)
-        if tooltipView.frame.contains(location) {
-            return
-        }
-        tooltipView.isHidden = true
-    }
-    
-    private func showTooltip(at position: CGPoint, with text: String) {
-        tooltipLabel.text = "Atom Type: \(text)"
-        tooltipView.isHidden = false
-        
-        let tooltipWidth: CGFloat = 200
-        let tooltipHeight: CGFloat = 50
-        
-        let adjustedX = max(min(position.x - tooltipWidth / 2, view.bounds.width - tooltipWidth), 0)
-        let adjustedY = max(min(position.y - tooltipHeight / 2, view.bounds.height - tooltipHeight), 0)
-        
-        tooltipView.frame = CGRect(x: adjustedX, y: adjustedY, width: tooltipWidth, height: tooltipHeight)
+    @objc private func dismissTooltip(_ gestureRecognize: UITapGestureRecognizer) {
+        guard let proteinsView = self.contentView as? ProteinsView else { return }
+        proteinsView.tooltipView.isHidden = true
     }
 }
 

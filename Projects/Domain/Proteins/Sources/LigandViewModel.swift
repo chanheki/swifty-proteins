@@ -306,8 +306,10 @@ public class LigandViewModel: ObservableObject {
         let geometry = SCNGeometry(sources: [vertexSource], elements: [element])
         geometry.firstMaterial?.diffuse.contents = UIColor.gray
         geometry.firstMaterial?.lightingModel = .constant
+        let node = SCNNode(geometry: geometry)
+        node.name = "stick"
         
-        return SCNNode(geometry: geometry)
+        return node
     }
     
     public func animateToSpaceFillingModel() {
