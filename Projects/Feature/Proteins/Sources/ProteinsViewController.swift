@@ -34,15 +34,25 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         return control
     }()
     
-    private let atomTypeLabel: UILabel = {
+    private let tooltipView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 8
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.3
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 4
+        view.isHidden = true
+        return view
+    }()
+    
+    private let tooltipLabel: UILabel = {
         let label = UILabel()
-        label.backgroundColor = .backgroundColor
-        label.textColor = .gray
-        label.textAlignment = .center
-        label.layer.cornerRadius = 8
-        label.layer.masksToBounds = true
-        label.text = "Atom Type: "
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .black
+        label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -79,12 +89,6 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
                 self.activityIndicator.stopAnimating()
             }
             .store(in: &cancellables)
-        
-        self.viewModel.atomTypeUpdateHandler = { [weak self] atomType in
-            DispatchQueue.main.async {
-                self?.atomTypeLabel.text = "Atom Type: \(atomType)"
-            }
-        }
     }
     
     private func fetchData(ligandName: String) {
@@ -110,8 +114,9 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     private func setupView() {
         view.addSubview(self.segmentedControl)
         view.addSubview(self.activityIndicator)
-        view.addSubview(self.atomTypeLabel)
-
+        view.addSubview(self.tooltipView)
+        self.tooltipView.addSubview(self.tooltipLabel)
+        
         NSLayoutConstraint.activate([
             self.segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             self.segmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -119,15 +124,18 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
             self.activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             self.activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
-            self.atomTypeLabel.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
-            self.atomTypeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            self.atomTypeLabel.widthAnchor.constraint(equalToConstant: 200),
-            self.atomTypeLabel.heightAnchor.constraint(equalToConstant: 40)
+            self.tooltipView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            self.tooltipView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
+            self.tooltipView.widthAnchor.constraint(lessThanOrEqualToConstant: 200),
+            
+            self.tooltipLabel.topAnchor.constraint(equalTo: tooltipView.topAnchor, constant: 10),
+            self.tooltipLabel.leadingAnchor.constraint(equalTo: tooltipView.leadingAnchor, constant: 10),
+            self.tooltipLabel.trailingAnchor.constraint(equalTo: tooltipView.trailingAnchor, constant: -10),
+            self.tooltipLabel.bottomAnchor.constraint(equalTo: tooltipView.bottomAnchor, constant: -10),
         ])
     }
     
     private func setupNavigationRightButton() {
-        // TODO: need view separate refactoring
         let largeConfig = UIImage.SymbolConfiguration(pointSize: 18, weight: .light, scale: .large)
         
         let userImage = UIImage(systemName: "info.bubble", withConfiguration: largeConfig)
@@ -200,21 +208,48 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
         if let proteinsView = self.contentView as? ProteinsView {
             proteinsView.sceneView.addGestureRecognizer(tapGesture)
         }
+        
+        let dismissTooltipGesture = UITapGestureRecognizer(target: self, action: #selector(dismissTooltip))
+        dismissTooltipGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(dismissTooltipGesture)
     }
     
     @objc private func handleTap(_ gestureRecognize: UIGestureRecognizer) {
         guard let proteinsView = self.contentView as? ProteinsView else { return }
         
         let location = gestureRecognize.location(in: proteinsView.sceneView)
-        let hitResults = proteinsView.sceneView.hitTest(location, options: [:])
+        let hitResults = proteinsView.sceneView.hitTest(location, options: [SCNHitTestOption.searchMode: SCNHitTestSearchMode.all.rawValue])
         
         if let result = hitResults.first {
-            if let atomNode = result.node as? SCNNode, let atomType = atomNode.name {
-                viewModel.atomTypeUpdateHandler?(atomType)
-            }
+            let atomType = result.node.name ?? "Unknown"
+            showTooltip(at: location, with: atomType)
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.tooltipView.isHidden = true
         }
     }
-
+    
+    @objc private func dismissTooltip(_ gestureRecognize: UIGestureRecognizer) {
+        let location = gestureRecognize.location(in: view)
+        if tooltipView.frame.contains(location) {
+            return
+        }
+        tooltipView.isHidden = true
+    }
+    
+    private func showTooltip(at position: CGPoint, with text: String) {
+        tooltipLabel.text = "Atom Type: \(text)"
+        tooltipView.isHidden = false
+        
+        let tooltipWidth: CGFloat = 200
+        let tooltipHeight: CGFloat = 50
+        
+        let adjustedX = max(min(position.x - tooltipWidth / 2, view.bounds.width - tooltipWidth), 0)
+        let adjustedY = max(min(position.y - tooltipHeight / 2, view.bounds.height - tooltipHeight), 0)
+        
+        tooltipView.frame = CGRect(x: adjustedX, y: adjustedY, width: tooltipWidth, height: tooltipHeight)
+    }
 }
 
 extension ProteinsViewController: UIPopoverPresentationControllerDelegate {
