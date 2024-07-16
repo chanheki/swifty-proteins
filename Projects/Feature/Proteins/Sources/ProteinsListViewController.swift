@@ -119,7 +119,7 @@ public final class ProteinsListViewController: BaseViewController<ProteinsListVi
     }
     
     @objc private func userButtonTapped() {
-        AppStateManager.shared.isPossibleCoverView = false
+        AppStateManager.shared.isShowPasswordPrompt = true
         let authenticationFlow = AuthenticationFlow()
         authenticationFlow.authenticateUser { [weak self] success, error in
             if success {
@@ -181,6 +181,6 @@ extension ProteinsListViewController: PasswordVerifyViewControllerDelegate {
             let settingViewController = SettingsViewController()
             navigationController?.pushViewController(settingViewController, animated: true)
         }
-        AppStateManager.shared.isPossibleCoverView = true
+        AppStateManager.shared.isShowPasswordPrompt = false
     }
 }

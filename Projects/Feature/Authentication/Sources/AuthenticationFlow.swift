@@ -41,7 +41,7 @@ public final class AuthenticationFlow {
                 completion(false, nil)
             }
         } else {
-            completion(true, nil)
+            completion(false, nil)
         }
     }
 }

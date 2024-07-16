@@ -38,5 +38,7 @@ public final class AppStateManager {
         set { defaults.set(newValue, forKey: "isPossibleCoverView") }
     }
     
+    public var isShowPasswordPrompt: Bool = false
     public var isBegin: Bool = true
+    
 }

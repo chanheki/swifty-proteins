@@ -157,7 +157,7 @@ public class ProteinsViewController: BaseViewController<ProteinsView> {
     }
     
     private func showErrorView(message: String) {
-        let errorView = CustomErrorView(errorMessage: message, parentViewController: self)
+        let errorView = CustomErrorView(errorMessage: message, parentViewController: self, button: "뒤로가기")
         errorView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(errorView)

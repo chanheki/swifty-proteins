@@ -13,6 +13,7 @@ import CoreAuthentication
 import DomainSettingsInterface
 
 public final class SettingsViewModel {
+    
     @Published public var settings: [SettingsType]
     @Published public var logoutSuccess: Bool?
     @Published public var deleteAccountSuccess: Bool?
@@ -29,6 +30,7 @@ public final class SettingsViewModel {
         switch setting {
         case .id:
             print(CoreDataProvider.shared.fetchAllUsers())
+            
             // ID 관련 로직 처리
             break
         case .logout:
@@ -37,7 +39,6 @@ public final class SettingsViewModel {
                     CoreDataProvider.shared.clearCoreData()
                     self.logoutSuccess = true
                 } else {
-                    // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
                     self.logoutSuccess = false
                 }
             }
@@ -48,7 +49,6 @@ public final class SettingsViewModel {
                     CoreDataProvider.shared.clearCoreData()
                     self.deleteAccountSuccess = true
                 } else {
-                    // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
                     self.deleteAccountSuccess = false
                 }
             }

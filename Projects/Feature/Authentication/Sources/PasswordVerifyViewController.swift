@@ -69,7 +69,7 @@ public final class PasswordVerifyViewController: PasswordRegistrationViewControl
         passwordTextField.layer.add(animation, forKey: "shake")
         
         // verificationDelegate 호출
-        verificationDelegate?.passwordVerificationDidFinish(success: false)
+//        verificationDelegate?.passwordVerificationDidFinish(success: false)
     }
 
 }
