@@ -9,7 +9,12 @@ import UIKit
 
 public final class AppStateManager {
     public static let shared = AppStateManager()
-    public init() {}
+    public init() {
+        defaults.register(defaults: [
+            "isPossibleCoverView": false,
+            "isLoggedIn": false
+        ])
+    }
     
     private let defaults = UserDefaults.standard
     
@@ -28,6 +33,10 @@ public final class AppStateManager {
         set { defaults.set(newValue, forKey: "isBiometricEnabled") }
     }
     
+    public var isPossibleCoverView: Bool {
+        get { defaults.bool(forKey: "isPossibleCoverView") }
+        set { defaults.set(newValue, forKey: "isPossibleCoverView") }
+    }
+    
     public var isBegin: Bool = true
-    public var isPossibleCoverView: Bool = true
 }
