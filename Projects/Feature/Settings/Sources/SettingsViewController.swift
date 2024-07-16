@@ -9,6 +9,7 @@ import UIKit
 import Combine
 
 import SharedCommonUI
+import DomainAuthentication
 import DomainSettings
 import FeatureSettingsInterface
 import FeatureAuthenticationInterface
@@ -50,7 +51,7 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
                     }
                 }
                 .store(in: &cancellables)
-
+            
             viewModel.$deleteAccountSuccess
                 .sink { [weak self] success in
                     if let success = success {
@@ -60,7 +61,6 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
                 .store(in: &cancellables)
         }
     }
-    
     
     // MARK: - BaseViewControllerProtocol
     
@@ -78,20 +78,19 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
         self.title = "Settings"
     }
     
-    
     private func handleLogout(success: Bool) {
         if success {
-            // 성공적으로 로그아웃 처리, 예: 로그인 화면으로 전환
+            NotificationCenter.default.post(name: NSNotification.Name("UserDidLogout"), object: nil)
         } else {
-            // 로그아웃 실패 처리, 예: 에러 메시지 표시
+            self.showErrorView(message: "로그아웃에 실패하였습니다. 다시시도 해주세요.")
         }
     }
-
+    
     private func handleDeleteAccount(success: Bool) {
         if success {
-            // 성공적으로 회원 탈퇴 처리, 예: 로그인 화면으로 전환
+            NotificationCenter.default.post(name: NSNotification.Name("UserDidLogout"), object: nil)
         } else {
-            // 회원 탈퇴 실패 처리, 예: 에러 메시지 표시
+            self.showErrorView(message: "회원 탈퇴에 실패하였습니다. 다시시도 해주세요.")
         }
     }
     
@@ -105,6 +104,20 @@ public final class SettingsViewController: BaseViewController<SettingsView> {
         let loginSuccessViewController = PasswordRegistrationSuccessViewController()
         loginSuccessViewController.delegate = self
         self.present(loginSuccessViewController, animated: true)
+    }
+    
+    private func showErrorView(message: String) {
+        let errorView = CustomErrorView(errorMessage: message, parentViewController: self)
+        errorView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(errorView)
+        
+        NSLayoutConstraint.activate([
+            errorView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            errorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            errorView.topAnchor.constraint(equalTo: view.topAnchor),
+            errorView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }
 
