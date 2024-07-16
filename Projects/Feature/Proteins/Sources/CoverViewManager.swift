@@ -19,7 +19,7 @@ public final class CoverViewManager {
     }
     
     public func addCoverView() {
-        if AppStateManager.shared.isPossibleCoverView {
+        if AppStateManager.shared.isPossibleCoverView && !AppStateManager.shared.isShowPasswordPrompt {
             startCoverView()
         }
     }

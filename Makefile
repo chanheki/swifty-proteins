@@ -17,6 +17,7 @@ fclean: clean
 	rm -rf **/**/**/*.xcodeproj
 	rm -rf **/**/*.xcodeproj
 	rm -rf **/*.xcodeproj
+	rm -rf *.xcodeproj
 	rm -rf *.xcworkspace
 	find . -name "DerivedData" -exec rm -rf {} +
 	find . -name "Derived" -exec rm -rf {} +

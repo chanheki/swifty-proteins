@@ -7,9 +7,9 @@
 
 import UIKit
 
-import Feature
-import DomainAuthentication
 import CoreCoreDataProvider
+import DomainAuthentication
+import Feature
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -18,6 +18,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUserLogout), name: NSNotification.Name("UserDidLogout"), object: nil)
         
         window = UIWindow(windowScene: windowScene)
         
@@ -60,12 +62,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
     
-    func showSettingsView(){
-        let settingViewController = SettingsViewController()
-        window?.rootViewController = settingViewController
-        window?.makeKeyAndVisible()
-    }
-    
     private func authenticateUser() {
         authenticationFlow?.authenticateUser { [weak self] success, error in
             if success {
@@ -78,6 +74,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func promptForPassword() {
+        AppStateManager.shared.isShowPasswordPrompt = true
         let passwordVerifyViewController = PasswordVerifyViewController()
         passwordVerifyViewController.verificationDelegate = self
         passwordVerifyViewController.modalPresentationStyle = .fullScreen
@@ -104,6 +101,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.authenticateUser()
         }
     }
+    
+    @objc private func handleUserLogout() {
+        showLoginView()
+        AppStateManager.shared.isPossibleCoverView = false
+    }
 }
 
 
@@ -111,6 +113,7 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
     
     // PasswordVerifyViewControllerDelegate
     func passwordVerificationDidFinish(success: Bool) {
+        AppStateManager.shared.isShowPasswordPrompt = false
         if success {
             if AppStateManager.shared.isBegin {
                 AppStateManager.shared.isBegin.toggle()
