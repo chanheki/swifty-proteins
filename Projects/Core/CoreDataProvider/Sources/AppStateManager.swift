@@ -28,6 +28,11 @@ public final class AppStateManager {
         set { defaults.set(newValue, forKey: "userID") }
     }
     
+    public var userName: String? {
+        get { defaults.string(forKey: "userName") }
+        set { defaults.set(newValue, forKey: "userName") }
+    }
+    
     public var isBiometricEnabled: Bool {
         get { defaults.bool(forKey: "isBiometricEnabled") }
         set { defaults.set(newValue, forKey: "isBiometricEnabled") }

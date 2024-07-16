@@ -87,9 +87,12 @@ extension AppleOAuthManager: ASAuthorizationControllerDelegate {
                     return
                 }
                 
-                // 프로필 변경이 완료된 후에 이름과 ID를 저장
+                // 처음 로그인한 경우.
                 if let fullName = appleIDCredential.fullName {
                     let displayName = [fullName.givenName, fullName.familyName].compactMap { $0 }.joined(separator: " ")
+                    let email = appleIDCredential.email ?? ""
+                    AppStateManager.shared.userName = displayName
+                    
                     if !CoreDataProvider.shared.createUser(id: appleIDCredential.user, name: displayName) {
                         self.completion?(false, error)
                     }
