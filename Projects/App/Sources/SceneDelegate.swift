@@ -138,6 +138,7 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
         if success {
             print("전체 로그인 성공")
             showMainView()
+            AppStateManager.shared.isPossibleCoverView = true
         } else {
             print("전체 로그인 실패: \(String(describing: error?.localizedDescription))")
             showLoginView()
@@ -164,6 +165,7 @@ extension SceneDelegate: PasswordVerifyViewControllerDelegate, PasswordRegistrat
         if success {
             print("로그인 성공: \(String(describing: error?.localizedDescription))")
             showPasswordRegistrationView()
+            AppStateManager.shared.isLoggedIn = true
         } else {
             print("로그인 실패: \(String(describing: error?.localizedDescription))")
             showLoginView()
