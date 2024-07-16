@@ -36,15 +36,32 @@ public class CustomErrorView: UIView {
         setupView()
     }
     
+    public convenience init(errorMessage: String, parentViewController: UIViewController, button: String) {
+        self.init(frame: .zero)
+        self.messageLabel.text = errorMessage
+        self.parentViewController = parentViewController
+        
+        setupView()
+        setupButton()
+        
+        self.confirmButton.setTitle("\(button)", for: .normal)
+    }
+    
     public convenience init(errorMessage: String, parentViewController: UIViewController) {
         self.init(frame: .zero)
         self.messageLabel.text = errorMessage
         self.parentViewController = parentViewController
+        
+        setupModal()
+    }
+    
+    public convenience init(errorMessage: String) {
+        self.init(frame: .zero)
+        self.messageLabel.text = errorMessage
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupView()
     }
     
     private func setupView() {
@@ -65,9 +82,13 @@ public class CustomErrorView: UIView {
             confirmButton.widthAnchor.constraint(equalToConstant: 100),
             confirmButton.heightAnchor.constraint(equalToConstant: 40)
         ])
-        
+    }
+    
+    private func setupButton() {
         confirmButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
-        
+    }
+    
+    private func setupModal() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissView))
         addGestureRecognizer(tapGesture)
     }
