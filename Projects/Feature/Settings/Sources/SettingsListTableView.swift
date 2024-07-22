@@ -73,17 +73,34 @@ extension SettingsListTableView: UITableViewDelegate {
         
         switch setting {
         case .id:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell") ?? UITableViewCell(style: .default, reuseIdentifier: "cell")
             cell.textLabel?.text = "User ID"
             cell.textLabel?.textColor = .label
             cell.accessoryType = .none
+            
+            let idLabel = UILabel()
+            
+            // TODO: - apple ID UI 고려
+            if AppStateManager.shared.userID?.contains("@") == true {
+                idLabel.text = AppStateManager.shared.userID ?? ""
+            } else {
+                idLabel.text = AppStateManager.shared.userName ?? "Apple ID"
+            }
+            
+            idLabel.textColor = .label
+            idLabel.sizeToFit()
+            idLabel.lineBreakMode = .byTruncatingTail
+            idLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            cell.accessoryView = idLabel
             return cell
             
         case .resetPassword:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "resetPasswordCell") ?? UITableViewCell(style: .default, reuseIdentifier: "resetPasswordCell")
             cell.textLabel?.text = "Reset Password"
             cell.textLabel?.textColor = .label
             cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
             return cell
             
         case .biometric:
@@ -95,17 +112,19 @@ extension SettingsListTableView: UITableViewDelegate {
             return cell
             
         case .logout:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "logoutCell") ?? UITableViewCell(style: .default, reuseIdentifier: "logoutCell")
             cell.textLabel?.text = "Logout"
             cell.textLabel?.textColor = .red
             cell.accessoryType = .none
+            cell.accessoryView = nil
             return cell
             
         case .deleteAccount:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "deleteAccountCell") ?? UITableViewCell(style: .default, reuseIdentifier: "deleteAccountCell")
             cell.textLabel?.text = "Delete Account"
             cell.textLabel?.textColor = .red
             cell.accessoryType = .none
+            cell.accessoryView = nil
             return cell
         }
     }

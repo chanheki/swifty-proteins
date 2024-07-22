@@ -60,13 +60,13 @@ public final class GoogleOAuthManager {
                     return
                 }
                 
-                guard let user = authResult?.user, let id = authResult?.user.providerID, let name = user.displayName else {
+                guard let user = authResult?.user, let email = authResult?.user.email, let name = user.displayName else {
                     completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "User information not found"]))
                     return
                 }
                 
-                if CoreDataProvider.shared.createUser(id: id, name: name) {
-                    AppStateManager.shared.userID = id
+                if CoreDataProvider.shared.createUser(id: email, name: name) {
+                    AppStateManager.shared.userID = email
                     completion(true, nil)
                 } else {
                     completion(false, NSError(domain: "GoogleOAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Create User Error"]))
