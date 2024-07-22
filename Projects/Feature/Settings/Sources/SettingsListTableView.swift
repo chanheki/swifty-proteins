@@ -109,7 +109,6 @@ extension SettingsListTableView: UITableViewDelegate {
             cell.textLabel?.textColor = .label
             cell.switchControl.isOn = AppStateManager.shared.isBiometricEnabled
             cell.switchControl.addTarget(self, action: #selector(biometricSwitchChanged(_:)), for: .valueChanged)
-            cell.accessoryView = nil
             return cell
             
         case .logout:
