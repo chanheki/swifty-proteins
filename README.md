@@ -176,8 +176,11 @@ final class LigandViewModelTests: XCTestCase {
 ### 구동화면
 
 
-https://github.com/user-attachments/assets/0df945c3-2ca1-4128-b483-41bed8a37bc0
+
+https://github.com/user-attachments/assets/243b039d-64e3-4523-a881-31236cd9f032
 
 
-https://github.com/user-attachments/assets/c50762c7-ee3e-41e4-815f-aee1afb1761e
+
+
+https://github.com/user-attachments/assets/6ea35773-c9c1-4fa3-8fee-e3d3890be0e6
 
