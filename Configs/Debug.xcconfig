@@ -1,0 +1,6 @@
+// Debug.xcconfig
+// 공개돼도 되는 값만 둔다. (client ID, team ID는 앱에 그대로 들어가는 공개 식별자)
+
+// Code signing: Apple Development: chanhee kim (P8F867WZSH)
+DEVELOPMENT_TEAM = QUAC995NAA
+CODE_SIGN_STYLE = Automatic
