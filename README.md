@@ -1,47 +1,81 @@
 # swifty-proteins *Apply a modular architecture 
 
-App - Features - Services - Core - Shared(UserInterface) 5개의 레이어를 가집니다.
+**English** | [한국어](README.ko.md)
+
+The app is split into five layers: App - Features - Services - Core - Shared (UserInterface).
 
 </br>
 
-# What each layer does (각 기능의 역할)
+# Getting Started
+
+### Requirements
+
+- Xcode 26 or later
+- [Tuist](https://tuist.dev) 4.x (pinned to 4.201.0 in `.mise.toml`)
+
+### Build and run
+
+```bash
+git clone https://github.com/chanheki/swifty-proteins.git
+cd swifty-proteins
+mise trust   # only if you use mise; makes it use the pinned Tuist version
+make         # installs packages and generates the Xcode project
+open SwiftyProteins.xcworkspace
+```
+
+In Xcode, pick the `SwiftyProteins` scheme and a simulator, then run (⌘R).
+
+### Signing in
+
+- **Sign in as Guest**: use every feature right away without an account (Firebase anonymous sign-in).
+- **Sign in with Google / Apple**: works with the Firebase config included in the repository.
+
+After signing in, register an app password to reach the ligand list and the 3D view.
+
+### Running on a device
+
+`DEVELOPMENT_TEAM` in `Configs/Debug.xcconfig` is set to the repository owner's team. To install on a device, change it to your own team ID, and change the bundle ID (`kr.mois.SwiftyProteins`) if needed. A different bundle ID no longer matches the Firebase config, so Google sign-in will not work. The simulator needs no signing and runs as is.
+
+</br>
+
+# What each layer does
 
 ### App
 
-- 앱의 진입점 및 전체적인 앱 라이프사이클 관리
-- 주요 앱 설정 및 초기화 코드
+- App entry point and overall app lifecycle
+- Main app configuration and initialization
 
 ### Feature
 
-- 사용자 인터페이스 및 사용자의 액션을 처리
-- 뷰(View) 및 뷰와 관련된 로직
+- User interface and handling of user actions
+- Views and view-related logic
 
 ### Domain
 
-- 비즈니스 로직과 애플리케이션의 도메인 모델
-- 엔터티, 유스케이스, 리포지토리 인터페이스 등
+- Business logic and the app's domain models
+- Entities, use cases, repository interfaces, etc.
 
 ### Core
 
-- 앱의 비즈니스를 포함하지 않는 순수 기능성 모듈
-- 네트워킹, 데이터베이스, 바이오메트릭스 등
+- Pure functional modules with no app business logic
+- Networking, database, biometrics, etc.
 
 ### Shared
 
-- 여러 모듈에서 공통적으로 사용되는 코드
-- 스타일, 리소스, 확장 기능 등
-- 공용 뷰, 디자인 시스템, 리소스 등 UI 요소
+- Code used across many modules
+- Styles, resources, extensions, etc.
+- Common views, the design system, and other UI elements
 
 </br>
 
 # Target Type
 
-타겟 타입은 다음과 같습니다.
+Each module has these target types:
 
-- Interface: 인터페이스
-- Implement: 구현부
-- Tests: 테스트
-- Testing: 테스트를 위한 목업
+- Interface: the interface
+- Implement: the implementation
+- Tests: tests
+- Testing: mocks for tests
 
 </br>
 
@@ -53,54 +87,54 @@ App - Features - Services - Core - Shared(UserInterface) 5개의 레이어를 �
 
 </br>
 
-# Implementing each feature (각 기능 구현)
+# Implementing each feature
 
-### 인증 부분 - OAuth 사용, 로그인 (Firebase로 구현)
+### Authentication - OAuth sign-in (implemented with Firebase)
 
-- Core: NetworkingModule (OAuth 네트워크 관련 코드), FirebaseModule (Firebase 인증 관리 코드)
-- Domain: AuthDomain (인증 관련 비즈니스 로직 및 인터페이스)
-- Feature: AuthFeature (로그인 UI 및 로그인 관련 화면)
+- Core: NetworkingModule (OAuth networking code), FirebaseModule (Firebase authentication)
+- Domain: AuthDomain (authentication business logic and interfaces)
+- Feature: AuthFeature (sign-in UI and related screens)
 
-### 앱 실행 시 - 바이오메트리 인증 (TouchID, FaceID 등)
+### On app launch - biometric authentication (Touch ID, Face ID, etc.)
 
-- Core: BiometricModule (바이오메트리 인증 관련 유틸리티 및 네트워크 코드)
-- Feature: AuthFeature (바이오메트리 인증 UI 및 화면)
+- Core: BiometricModule (biometric authentication utilities)
+- Feature: AuthFeature (biometric authentication UI and screens)
 
-### 에러처리 - API 에러처리 및 미 인가 화면
+### Error handling - API errors and unauthorized screens
 
-- Core: ErrorHandlingModule (공통 에러 처리 유틸리티 및 네트워크 에러 핸들링)
-- Shared: ErrorView (에러 메시지 UI 및 에러 화면)
+- Core: ErrorHandlingModule (common error utilities and network error handling)
+- Shared: ErrorView (error message UI and error screens)
 
-### 앱 구동
+### Running the app
 
 - Protein list view: tableView → ligands list
-  - Feature: FeatureProteins (Protein List View - TableView 구현)
+  - Feature: FeatureProteins (Protein List View - TableView)
 
-- Protein view: SceneKit → model로 부터 받은 데이터를 보여주는곳
-  - Core: NetworkingModule (API 통신 관련 코드)
-  - Feature: FeatureProteins (Protein View - SceneKit을 사용한 3D 모델 표시)
+- Protein view: SceneKit → shows the data received from the model
+  - Core: NetworkingModule (API communication)
+  - Feature: FeatureProteins (Protein View - 3D model with SceneKit)
 
-- Protein model → API로부터 받을 모델을 정의하는곳
-  - Domain: DomainProteins (Protein Model 정의 및 데이터 구조)
+- Protein model → defines the model received from the API
+  - Domain: DomainProteins (Protein Model and data structures)
 
-- Protein viewmodel → API로 받은 모델의 비즈니스로직
-  - Domain: DomainProteins (ViewModel과 관련된 비즈니스 로직)
-
-</br>
-
-### 객체지향적 설계
-
-1. 분리된 모듈: 각 레이어와 모듈을 명확히 분리합니다. 특정 기능이 필요한 경우 해당 레이어의 인터페이스를 통해 접근하도록 설계합니다.
-2. 재사용성: 공통 코드와 유틸리티는 Shared 및 Core 레이어에 위치시켜 재사용성을 극대화합니다.
-3. 의존성 주입: 각 레이어 간의 의존성은 가능한 한 주입 방식을 통해 관리하여 결합도를 낮춥니다.
-4. 테스트 가능성: Domain 레이어의 비즈니스 로직, 각 레이어의 로직은 테스트 가능하도록 설계하여 단위 테스트를 용이하게 합니다.
-5. UI와 로직 분리: Feature 레이어의 UI와 비즈니스 로직은 명확히 분리하여 코드의 가독성과 유지보수성을 높입니다.
+- Protein viewmodel → business logic for the model received from the API
+  - Domain: DomainProteins (ViewModel business logic)
 
 </br>
 
-### 테스트 코드 예시
+### Object-oriented design
 
-Domain 레이어의 비즈니스 로직을 테스트 하기 위해 작성된 실제 코드의 일부를 가져왔습니다.
+1. Separated modules: each layer and module is clearly separated. When a feature is needed, it is accessed through that layer's interface.
+2. Reusability: common code and utilities live in the Shared and Core layers to maximize reuse.
+3. Dependency injection: dependencies between layers are passed in wherever possible to keep coupling low.
+4. Testability: the Domain layer's business logic, and each layer's logic, is designed to be testable so unit tests are easy to write.
+5. Separating UI and logic: UI and business logic in the Feature layer are clearly separated for readability and maintainability.
+
+</br>
+
+### Test code example
+
+Part of the actual code written to test the Domain layer's business logic.
 
 ``` swift
 //  ProteinsTesting.swift
@@ -173,9 +207,7 @@ final class LigandViewModelTests: XCTestCase {
 
 ```
 
-### 구동화면
-
-
+### Demo
 
 https://github.com/user-attachments/assets/243b039d-64e3-4523-a881-31236cd9f032
 
@@ -183,4 +215,3 @@ https://github.com/user-attachments/assets/243b039d-64e3-4523-a881-31236cd9f032
 
 
 https://github.com/user-attachments/assets/6ea35773-c9c1-4fa3-8fee-e3d3890be0e6
-
