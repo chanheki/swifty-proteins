@@ -35,7 +35,19 @@ let targets: [Target] = [
             ),
             dependencies: [
                 .feature
-            ]
+            ],
+            settings: .settings(
+                base: [
+                    "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+                    // Firebase/GoogleUtilities는 static으로 링크되므로 ObjC category를 강제로 로드해야 한다.
+                    "OTHER_LDFLAGS": ["$(inherited)", "-ObjC"]
+                ],
+                configurations: [
+                    .debug(name: "Debug", xcconfig: .relativeToRoot("Configs/Debug.xcconfig")),
+                    .release(name: "Release", xcconfig: .relativeToRoot("Configs/Release.xcconfig"))
+                ],
+                defaultSettings: .recommended
+            )
         )
     ),
 ]
