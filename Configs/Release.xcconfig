@@ -7,3 +7,6 @@ CODE_SIGN_STYLE = Automatic
 
 // Google 로그인 URL scheme (GoogleService-Info.plist의 REVERSED_CLIENT_ID)
 GOOGLE_CLIENT_ID = com.googleusercontent.apps.711006035349-5nt5014cpbo8irsf8luu0otaedo7t807
+
+// 리간드 CIF 다운로드 주소. xcconfig에서 //는 주석이라 $()로 끊어 쓴다.
+BASE_URL = https:/$()/files.rcsb.org/ligands/view

@@ -29,7 +29,7 @@ public final class NetworkManager {
             return
         }
 
-        let endpoint = "\(baseURL)/\(ligandID.prefix(1))/\(ligandID.prefix(3))/\(ligandID)_ideal.pdb"
+        let endpoint = "\(baseURL)/\(ligandID).cif"
         
         guard let url = URL(string: endpoint) else {
             completion(.failure(.invalidURL))

@@ -19,8 +19,11 @@ public class LigandViewModel: ObservableObject {
     @Published public var ligandData: Data?
     @Published public var errorMessage: String?
     @Published public var proteinScene: SCNScene?
-    
+
     var pdbDataProvider: ProteinsPDBDataProvider?
+
+    private var structure: Ligand?
+    private let parser = LigandCIFParser()
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -102,23 +105,8 @@ public class LigandViewModel: ObservableObject {
     }
     
     public var usedElements: [String] {
-        guard let ligandData = ligandData else { return [] }
-        
-        let pdbDataString = String(data: ligandData, encoding: .utf8) ?? ""
-        let lines = pdbDataString.split(separator: "\n")
-        
-        var elements = Set<String>()
-        
-        for line in lines {
-            let components = line.split(separator: " ", omittingEmptySubsequences: true)
-            if components.count > 11 && components[0] == "ATOM" {
-                let element = String(components[11])
-                if elementColors.keys.contains(element) {
-                    elements.insert(element)
-                }
-            }
-        }
-        
+        guard let structure = structure else { return [] }
+        let elements = Set(structure.atoms.map(\.element)).filter { elementColors.keys.contains($0) }
         return Array(elements).sorted()
     }
     
@@ -149,37 +137,34 @@ public class LigandViewModel: ObservableObject {
     }
     
     private func createProteinsScene(from data: Data, modelType: ProteinsModelType) {
-        guard let pdbDataString = String(data: data, encoding: .utf8) else {
+        guard let cifString = String(data: data, encoding: .utf8) else {
             self.errorMessage = "Failed to convert data to string"
             return
         }
-        
-        let proteinNode = SCNNode()
-        let lines = pdbDataString.split(separator: "\n")
-        
-        var atoms = [Int: SCNNode]()
-        
-        for line in lines {
-            let components = line.split(separator: " ", omittingEmptySubsequences: true)
-            if components.count > 6 && components[0] == "ATOM" {
-                let index = Int(components[1]) ?? 0
-                let x = Float(components[6]) ?? 0.0
-                let y = Float(components[7]) ?? 0.0
-                let z = Float(components[8]) ?? 0.0
-                let element = String(components[11])
-                
-                let atomNode: SCNNode
-                
-                atomNode = createNode(element: element, position: SCNVector3(x, y, z), modelType: modelType)
-                
-                proteinNode.addChildNode(atomNode)
-                atoms[index] = atomNode
-            }
+
+        let structure: Ligand
+        do {
+            structure = try parser.parse(cifString)
+        } catch {
+            self.errorMessage = error.localizedDescription
+            return
         }
-        
+        self.structure = structure
+
+        let proteinNode = SCNNode()
+
+        let atomNodes = structure.atoms.map { atom -> SCNNode in
+            let position = SCNVector3(atom.position.x, atom.position.y, atom.position.z)
+            let atomNode = createNode(element: atom.element, position: position, modelType: modelType)
+            proteinNode.addChildNode(atomNode)
+            return atomNode
+        }
+
         if modelType == .ballStick {
-            let bondNodes = createBonds(from: pdbDataString, atoms: atoms)
-            bondNodes.forEach { proteinNode.addChildNode($0) }
+            for bond in structure.bonds {
+                let bondNode = createBondNode(from: atomNodes[bond.atomIndex1].position, to: atomNodes[bond.atomIndex2].position)
+                proteinNode.addChildNode(bondNode)
+            }
         }
         
         let scene = SCNScene()
@@ -261,27 +246,6 @@ public class LigandViewModel: ObservableObject {
         return elementRadii[element] ?? elementRadii["Other"]!
     }
     
-    private func createBonds(from pdbData: String, atoms: [Int: SCNNode]) -> [SCNNode] {
-        var bonds = [SCNNode]()
-        let lines = pdbData.split(separator: "\n")
-        
-        for line in lines {
-            let components = line.split(separator: " ", omittingEmptySubsequences: true)
-            if components.count > 2 && components[0] == "CONECT" {
-                let atomIndex = Int(components[1]) ?? 0
-                for i in 2..<components.count {
-                    let connectedAtomIndex = Int(components[i]) ?? 0
-                    if let atomNode = atoms[atomIndex], let connectedAtomNode = atoms[connectedAtomIndex] {
-                        let bondNode = createBondNode(from: atomNode.position, to: connectedAtomNode.position)
-                        bonds.append(bondNode)
-                    }
-                }
-            }
-        }
-        
-        return bonds
-    }
-    
     private func createBondNode(from startPosition: SCNVector3, to endPosition: SCNVector3) -> SCNNode {
         let positions: [SCNVector3] = [startPosition, endPosition]
         let positionData = Data(bytes: positions, count: MemoryLayout<SCNVector3>.size * positions.count)
@@ -354,23 +318,6 @@ public class LigandViewModel: ObservableObject {
     }
     
     public func countForElement(_ element: String) -> Int {
-        guard let ligandData = ligandData else { return 0 }
-        
-        let pdbDataString = String(data: ligandData, encoding: .utf8) ?? ""
-        let lines = pdbDataString.split(separator: "\n")
-        
-        var count = 0
-        
-        for line in lines {
-            let components = line.split(separator: " ", omittingEmptySubsequences: true)
-            if components.count > 11 && components[0] == "ATOM" {
-                let elementSymbol = String(components[11])
-                if elementSymbol == element {
-                    count += 1
-                }
-            }
-        }
-        
-        return count
+        return structure?.atoms.filter { $0.element == element }.count ?? 0
     }
 }
