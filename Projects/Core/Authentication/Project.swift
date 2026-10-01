@@ -19,7 +19,7 @@ let project = Project.makeModule(
                 resources: ["Resources/**"],
                 dependencies: [
                     .core(interface: .Authentication),
-                    .core(interface: .CoreDataProvider),
+                    .core(implements: .CoreDataProvider),
                     .external(name: "FirebaseAppCheck"),
                     .external(name: "FirebaseAppDistribution-Beta"),
                     .external(name: "FirebaseAnalytics"),
