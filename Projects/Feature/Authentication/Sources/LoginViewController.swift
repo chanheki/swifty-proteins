@@ -55,7 +55,23 @@ public final class LoginViewController: UIViewController {
         appleLoginButton.translatesAutoresizingMaskIntoConstraints = false
         return appleLoginButton
     }()
-    
+
+    private var separatorView: UIView = {
+        let separatorView = UIView()
+        separatorView.backgroundColor = .separator
+        separatorView.translatesAutoresizingMaskIntoConstraints = false
+        return separatorView
+    }()
+
+    private var guestLoginButton: UIButton = {
+        let guestLoginButton = UIButton(type: .system)
+        guestLoginButton.setTitle("Sign in as Guest", for: .normal)
+        guestLoginButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        guestLoginButton.tintColor = .gray
+        guestLoginButton.translatesAutoresizingMaskIntoConstraints = false
+        return guestLoginButton
+    }()
+
     private var portraitConstraints: [NSLayoutConstraint] = []
     private var landscapeConstraints: [NSLayoutConstraint] = []
     
@@ -87,6 +103,7 @@ public final class LoginViewController: UIViewController {
         
         googleLoginButton.addTarget(self, action: #selector(startGoogleSignIn), for: .touchUpInside)
         appleLoginButton.addTarget(self, action: #selector(startAppleSignIn), for: .touchUpInside)
+        guestLoginButton.addTarget(self, action: #selector(startGuestSignIn), for: .touchUpInside)
     }
     
     private func applyConstraints(for size: CGSize) {
@@ -103,14 +120,29 @@ public final class LoginViewController: UIViewController {
         view.addSubview(loginLabel)
         view.addSubview(googleLoginButton)
         view.addSubview(appleLoginButton)
-        
+        view.addSubview(separatorView)
+        view.addSubview(guestLoginButton)
+
         initConstraints()
         applyConstraints(for: view.bounds.size)
         
     }
     
     private func initConstraints() {
-        self.portraitConstraints = [
+        let separatorHeight = 1 / UIScreen.main.scale
+        let guestConstraints = [
+            separatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            separatorView.topAnchor.constraint(equalTo: appleLoginButton.bottomAnchor, constant: 16),
+            separatorView.widthAnchor.constraint(equalToConstant: 250),
+            separatorView.heightAnchor.constraint(equalToConstant: separatorHeight),
+
+            guestLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            guestLoginButton.topAnchor.constraint(equalTo: separatorView.bottomAnchor, constant: 8),
+            guestLoginButton.widthAnchor.constraint(equalToConstant: 250),
+            guestLoginButton.heightAnchor.constraint(equalToConstant: 48)
+        ]
+
+        self.portraitConstraints = guestConstraints + [
             loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.height / 5),
             
@@ -125,12 +157,13 @@ public final class LoginViewController: UIViewController {
             appleLoginButton.heightAnchor.constraint(equalToConstant: 48)
         ]
         
-        self.landscapeConstraints = [
+        self.landscapeConstraints = guestConstraints + [
             loginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loginLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width / 5),
-            
+
             googleLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width * 0.66),
+            // Guest 버튼까지 가로 화면 높이 안에 들어오도록 버튼 묶음을 위로 올린다.
+            googleLoginButton.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.size.width * 0.45),
             googleLoginButton.widthAnchor.constraint(equalToConstant: 250),
             googleLoginButton.heightAnchor.constraint(equalToConstant: 48),
             
@@ -166,6 +199,14 @@ public final class LoginViewController: UIViewController {
             }
         }
     }
-    
+
+    @objc private func startGuestSignIn() {
+        GuestOAuthManager.shared.startGuestSignIn { [weak self] success, error in
+            DispatchQueue.main.async {
+                self?.delegate?.oauthLoginDidFinish(success: success, error: error)
+            }
+        }
+    }
+
 }
 
