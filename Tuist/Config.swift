@@ -8,7 +8,7 @@
 import ProjectDescription
 
 let config = Config(
-    compatibleXcodeVersions: ["15.2"],
+    compatibleXcodeVersions: .upToNextMajor("26.0"),
     swiftVersion: "5.9.2",
     plugins: [
             .local(path: .relativeToRoot("Plugins/DependencyPlugin/")),
