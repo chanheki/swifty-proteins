@@ -13,6 +13,9 @@ let project = Project.makeModule(
                     .feature(testing: .Proteins),
                     .feature(interface: .Authentication),
                     .feature(interface: .Settings),
+                    // TODO: 화면 전환을 상위로 위임하면 제거 (현재 구체 VC를 직접 생성함)
+                    .feature(implements: .Authentication),
+                    .feature(implements: .Settings),
                 ]
             )
         ),
