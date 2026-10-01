@@ -76,3 +76,7 @@ Derived/
 
 ### Tuist managed dependencies ###
 Tuist/.build
+
+# 과제 원문 / 로컬 산출물
+en.subject.pdf
+output/
