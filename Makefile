@@ -5,6 +5,8 @@
 
 gen:
 	tuist install
+	# Firebase의 Copy Module Map 스크립트가 읽기 전용 원본을 cp해서 두 번째 빌드부터 Permission denied가 난다.
+	chmod u+w Tuist/.build/checkouts/firebase-ios-sdk/CoreOnly/Sources/module.modulemap
 	tuist generate
 
 clean:
