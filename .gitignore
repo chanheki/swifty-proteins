@@ -8,6 +8,8 @@
 *.key
 Signing/
 *.plist
+# Firebase 설정은 공개 식별자만 담고 있어 커밋한다 (clone 후 바로 실행 가능하도록)
+!Projects/App/Resources/GoogleService-Info.plist
 
 # IDE
 .vscode/

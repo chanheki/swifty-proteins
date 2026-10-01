@@ -4,3 +4,6 @@
 // Code signing: Apple Development: chanhee kim (P8F867WZSH)
 DEVELOPMENT_TEAM = QUAC995NAA
 CODE_SIGN_STYLE = Automatic
+
+// Google 로그인 URL scheme (GoogleService-Info.plist의 REVERSED_CLIENT_ID)
+GOOGLE_CLIENT_ID = com.googleusercontent.apps.711006035349-5nt5014cpbo8irsf8luu0otaedo7t807
